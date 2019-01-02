@@ -1,0 +1,1 @@
+cmd.exe /c taskkill /IM Vita3K.exe || unbuffer cmake CMakeLists.txt && unbuffer make && rm -r /mnt/c/Users/Praktikant/AppData/Roaming/Vita3K/Vita3K/ux0/app/ESPL00009 && cmd.exe /c start ./v3k/Vita3K.exe -i easyplugin.vpk
