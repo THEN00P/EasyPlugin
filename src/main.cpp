@@ -1,6 +1,7 @@
 #include <vita2d.h>
 #include <psp2/ctrl.h>
 #include <psp2/kernel/processmgr.h>
+#include <psp2/power.h> 
 #include <psp2/io/fcntl.h>
 #include <fstream>
 #include <string>
@@ -10,6 +11,7 @@ using namespace std;
 #include "utils/json.hpp"
 #include "net/download.hpp"
 #include "utils/search.hpp"
+#include "utils/format.hpp"
 
 using json = nlohmann::json;
 
@@ -24,6 +26,8 @@ int main() {
 
     vita2d_font *font = vita2d_load_font_mem(basicfont, basicfont_size);
     vita2d_texture *bgIMG = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/bg.png");
+    vita2d_texture *desc = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc.png");
+    vita2d_texture *desc1 = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc1.png");
 
     // netInit();
     // httpInit();
@@ -32,21 +36,38 @@ int main() {
     // netTerm();
     
     int scene = 0;
+    bool initDetail = true;
+
+
+    string searchResult = "";
+    string longDescription;
+    string plName = "AnalogsEnhancer.skprx";
+    string taiConfig = "";
+    string taiConfigPath = "";
 
     int cursorY = 0;
-    string searchResult = "";
-    double scrollY = 0;
     int scrollDelay = 0;
     int scrollStage = 0;
+    int arrayLength;
+    int lastNum = 0;
 
-    ifstream i("ux0:data/Easy_Plugins/plugins.json");
+    ifstream plp("ux0:data/Easy_Plugins/plugins.json");
     json plugins;
-    i >> plugins;
+    plp >> plugins;
+    plp.close();
+
+    if(doesDirExist("ux0:tai")) taiConfigPath = "ux0:tai/";
+    else if(doesDirExist("ur0:tai")) taiConfigPath = "ur0:tai/";
+    else return 0;
+
+    ifstream blb(taiConfigPath+"config.txt");
+    blb >> taiConfig;
+    blb.close();
 
     json original = plugins;
 
-    int arrayLength;
 
+    double scrollY = 0;
     double scrollPercent;
     double scrollThumbHeight;
     double scrollThumbY = 0;
@@ -60,15 +81,15 @@ int main() {
 
         if(scene == 0) {
             arrayLength = static_cast<int>(plugins.size());     
-            scrollPercent = 544.0 / (arrayLength*85);   
-            scrollThumbHeight = 544*scrollPercent;
+            scrollPercent = 504.0 / (arrayLength*85);   
+            scrollThumbHeight = 504*scrollPercent;
 
             scrollThumbY = scrollY*scrollPercent;
             if(scrollDelay >= 0) scrollDelay--;
 
             vita2d_draw_rectangle(950, scrollThumbY, 10, scrollThumbHeight, RGBA8(0,0,0,150));
 
-            if(cursorY*85>scrollY+459) scrollY += 85;
+            if(cursorY*85>scrollY+374) scrollY += 85;
             if(cursorY*85<scrollY) scrollY -= 85;
 
             // special iterator member functions for objects
@@ -83,19 +104,22 @@ int main() {
             }
 
             vita2d_draw_rectangle(10, (cursorY*85)+14-scrollY, 940, 80, RGBA8(0,0,0,80));
-
-            vita2d_font_draw_textf(font, 18, 42, RGBA8(0,0,0,255), 36, "%s", searchResult.c_str());
-            vita2d_font_draw_textf(font, 20, 40, RGBA8(255,255,255,255), 32, "%s", searchResult.c_str());
+            
+            vita2d_draw_texture(desc, 0, 504);
             
             if(scrollDelay <= 1) {
                 if(scrollDelay == 0) scrollStage = 0;
                 switch(pad.buttons) {
+                    case SCE_CTRL_CROSS:
+                        initDetail = true;
+                        scene = 1;
+                        break;
                     case SCE_CTRL_TRIANGLE:
                         searchResult = initImeDialog("Search", "Enter a query", 28);
 
                         if(searchResult == "" || searchResult == "*") plugins = original;
+                        else if(searchResult != "❌") plugins = sortJson(searchResult, original);
 
-                        plugins = sortJson(searchResult, original);
                         cursorY = 0;
                         break;
                     case SCE_CTRL_DOWN:
@@ -125,6 +149,37 @@ int main() {
                 }
             }
         }
+        if(scene == 1) {
+            if(initDetail) {
+                longDescription = formatLongDesc(plugins[cursorY]["long_description"].get<string>());
+
+                initDetail = false;
+            }
+
+            vita2d_font_draw_textf(font, 20, 45, RGBA8(255,255,255,255), 35, "%s", (plugins[cursorY]["name"].get<string>() + " " + plugins[cursorY]["version"].get<string>()).c_str());
+            
+            vita2d_font_draw_textf(font, 20, 350, RGBA8(255,255,255,255), 32, "%s", longDescription.c_str());
+
+            vita2d_draw_texture(desc1, 0, 504);
+
+            if(scrollDelay <= 1) {
+                if(scrollDelay == 0) scrollStage = 0;
+                switch(pad.buttons) {
+                    case SCE_CTRL_CIRCLE:
+                        scene = 0;
+                        break;
+                    case SCE_CTRL_CROSS:
+                        // plName = curlDownloadKeepName(plugins[cursorY]["url"].get<string>().c_str());
+                        if(plName.find(".skprx") != string::npos) {
+                            taiConfig += ("*KERNEL\n"+taiConfigPath+plName);
+                            ofstream tat(taiConfigPath+"config.txt");
+                            tat << taiConfig;
+                            tat.close();
+                        }
+                        break;
+                }
+            }
+        }
 
         vita2d_end_drawing();
         vita2d_swap_buffers();
@@ -132,10 +187,15 @@ int main() {
         if(pad.buttons == SCE_CTRL_SELECT) {
             break;
         }
+        if(pad.buttons == SCE_CTRL_START) {
+            scePowerRequestColdReset();
+        }
     }
 
     vita2d_free_font(font);
     vita2d_free_texture(bgIMG);
+    vita2d_free_texture(desc);
+    vita2d_free_texture(desc1);
     vita2d_fini();
     
     sceKernelExitProcess(0);

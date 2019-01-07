@@ -101,8 +101,8 @@ string initImeDialog(char *title, char *initial_text, int max_text_length) {
 			sceImeDialogGetResult(&result);
 
 			if (result.button == SCE_IME_DIALOG_BUTTON_CLOSE || status == IME_DIALOG_RESULT_CANCELED) {
-				done = true;
-				break;
+				sceImeDialogTerm();
+				return "❌";
 			} else {
 				oslOskGetText(userText);
 			}

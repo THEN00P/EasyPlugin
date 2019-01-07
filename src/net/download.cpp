@@ -20,42 +20,13 @@ unsigned char logs[64*1024];
 CURL *curl;
 CURLcode res;
 
-void netInit() {
-	sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
-
-	SceNetInitParam netInitParam;
-	int size = 1*1024*1024;
-	netInitParam.memory = malloc(size);
-	netInitParam.size = size;
-	netInitParam.flags = 0;
-	sceNetInit(&netInitParam);
-
-	sceNetCtlInit();
-}
-
-void netTerm() {
-	sceNetCtlTerm();
-	sceNetTerm();
-	sceSysmoduleUnloadModule(SCE_SYSMODULE_NET);
-}
-
-void httpInit() {
-	sceSysmoduleLoadModule(SCE_SYSMODULE_SSL);
-	sceSysmoduleLoadModule(SCE_SYSMODULE_HTTPS);
-	sceHttpInit(1*1024*1024);
-	sceSslInit(1*1024*1024);
-}
-
-void httpTerm() {
-	sceSslTerm();
-	sceHttpTerm();
-	sceSysmoduleUnloadModule(SCE_SYSMODULE_HTTPS);
-	sceSysmoduleUnloadModule(SCE_SYSMODULE_SSL);
-}
-
 static size_t write_data_to_disk(void *ptr, size_t size, size_t nmemb, void *stream){
   size_t written = sceIoWrite(   *(int*) stream , ptr , size*nmemb);
   return written;
+}
+
+void curlDownloadKeepName(const char *url) {
+	//do when you have a vita to test;
 }
 
 void curlDownload(const char *url, const char *dest) {

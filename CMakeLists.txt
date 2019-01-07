@@ -55,6 +55,7 @@ add_executable(easyplugin
     src/main.cpp
     src/net/download.cpp
     src/utils/search.cpp
+    src/utils/format.cpp
     src/graphics/2dfont.cpp
 )
 
@@ -74,6 +75,7 @@ target_link_libraries(easyplugin
     SceSsl_stub
     SceIofilemgr_stub
     SceHttp_stub
+    ScePower_stub
     SceIme_stub
     SceSysmodule_stub
     SceDisplay_stub
@@ -93,4 +95,6 @@ vita_create_vpk(easyplugin.vpk ${VITA_TITLEID} easyplugin.self
   FILE sce_sys/livearea/contents/startup.png sce_sys/livearea/contents/startup.png
   FILE sce_sys/livearea/contents/template.xml sce_sys/livearea/contents/template.xml
   FILE src/graphics/bg.png resources/bg.png
+  FILE src/graphics/desc.png resources/desc.png
+  FILE src/graphics/desc1.png resources/desc1.png
 )
