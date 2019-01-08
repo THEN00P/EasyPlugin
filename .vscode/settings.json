@@ -64,6 +64,11 @@
         "locale": "cpp",
         "xlocmes": "cpp",
         "xlocmon": "cpp",
-        "xloctime": "cpp"
+        "xloctime": "cpp",
+        "filesystem": "cpp",
+        "chrono": "cpp",
+        "iomanip": "cpp",
+        "ratio": "cpp",
+        "utils.h": "c"
     }
 }

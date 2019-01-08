@@ -34,7 +34,7 @@ set(VITA_VERSION  "01.00")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 # Optional. You can specify more param.sfo flags this way.
-set(VITA_MKSFOEX_FLAGS "${VITA_MKSFOEX_FLAGS} -d PARENTAL_LEVEL=1")
+set(VITA_MKSFOEX_FLAGS "${VITA_MKSFOEX_FLAGS} -d PARENTAL_LEVEL=7")
 
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
@@ -56,6 +56,14 @@ add_executable(easyplugin
     src/net/download.cpp
     src/utils/search.cpp
     src/utils/format.cpp
+    src/utils/minizip/unzip.c
+    src/utils/minizip/ioapi.c
+    src/utils/vpkInstaller/archive.c
+    src/utils/vpkInstaller/file.c
+    src/utils/vpkInstaller/package_installer.c
+    src/utils/vpkInstaller/sfo.c
+    src/utils/vpkInstaller/sha1.c
+    src/utils/vpkInstaller/utils.c
     src/graphics/2dfont.cpp
 )
 
@@ -72,6 +80,9 @@ target_link_libraries(easyplugin
     SceSysmodule_stub
     SceNet_stub
     SceNetCtl_stub
+    SceAppUtil_stub
+    SceAppMgr_stub
+    ScePromoterUtil_stub 
     SceSsl_stub
     SceIofilemgr_stub
     SceHttp_stub

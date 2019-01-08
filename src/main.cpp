@@ -37,6 +37,7 @@ int main() {
     
     int scene = 0;
     bool initDetail = true;
+    bool blockCross = false;
 
 
     string searchResult = "";
@@ -79,6 +80,8 @@ int main() {
 
         vita2d_draw_texture(bgIMG, 0, 0);
 
+        if(pad.buttons != SCE_CTRL_CROSS) blockCross = false;
+
         if(scene == 0) {
             arrayLength = static_cast<int>(plugins.size());     
             scrollPercent = 504.0 / (arrayLength*85);   
@@ -111,7 +114,10 @@ int main() {
                 if(scrollDelay == 0) scrollStage = 0;
                 switch(pad.buttons) {
                     case SCE_CTRL_CROSS:
+                        if(blockCross) break;
                         initDetail = true;
+                        blockCross = true;
+
                         scene = 1;
                         break;
                     case SCE_CTRL_TRIANGLE:
@@ -169,13 +175,12 @@ int main() {
                         scene = 0;
                         break;
                     case SCE_CTRL_CROSS:
+                        if(blockCross) break;
+
                         // plName = curlDownloadKeepName(plugins[cursorY]["url"].get<string>().c_str());
-                        if(plName.find(".skprx") != string::npos) {
-                            taiConfig += ("*KERNEL\n"+taiConfigPath+plName);
-                            ofstream tat(taiConfigPath+"config.txt");
-                            tat << taiConfig;
-                            tat.close();
-                        }
+                        installPL(plName, taiConfig, taiConfigPath);
+
+                        blockCross = true;
                         break;
                 }
             }
