@@ -48,5 +48,8 @@ Makefile
 CMakeCache.txt
 *.cmake
 
+# vscode
+.vscode
+
 # project specific
 easyplugin
