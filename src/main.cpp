@@ -13,6 +13,10 @@ using namespace std;
 #include "utils/search.hpp"
 #include "utils/format.hpp"
 
+extern "C" {
+    #include "utils/lazy/archive.h"
+}
+
 using json = nlohmann::json;
 
 extern unsigned int basicfont_size;
@@ -155,7 +159,7 @@ int main() {
                 }
             }
         }
-        if(scene == 1) {
+        if(scene == 1 || scene == 2) {
             if(initDetail) {
                 longDescription = formatLongDesc(plugins[cursorY]["long_description"].get<string>());
 
@@ -168,20 +172,53 @@ int main() {
 
             vita2d_draw_texture(desc1, 0, 504);
 
+            if(scene == 2) {
+                if(plName.find(".zip") != string::npos) {
+                    extractArchivePath((taiConfigPath+plName).c_str(), (taiConfigPath+"extracted/").c_str(), NULL);
+                }
+                else if(plName.find(".suprx")) {
+
+                }
+                else if(plName.find(".skprx") != string::npos) {
+                    taiConfig += ("*KERNEL\n"+taiConfigPath+plName);
+                }
+                else {
+                    
+                }
+
+                ofstream tat(taiConfigPath+"config.txt");
+                tat << taiConfig;
+                tat.close();
+            }
+
             if(scrollDelay <= 1) {
                 if(scrollDelay == 0) scrollStage = 0;
-                switch(pad.buttons) {
-                    case SCE_CTRL_CIRCLE:
-                        scene = 0;
-                        break;
-                    case SCE_CTRL_CROSS:
-                        if(blockCross) break;
 
-                        // plName = curlDownloadKeepName(plugins[cursorY]["url"].get<string>().c_str());
-                        installPL(plName, taiConfig, taiConfigPath);
+                if(scene == 1) {
+                    switch(pad.buttons) {
+                        case SCE_CTRL_CIRCLE:
+                            scene = 0;
+                            break;
+                        case SCE_CTRL_CROSS:
+                            if(blockCross) break;
 
-                        blockCross = true;
-                        break;
+                            scene = 2;
+                            
+                            blockCross = true;
+                            break;
+                    }
+                }
+                if(scene == 2) {
+                    switch(pad.buttons) {
+                        case SCE_CTRL_CIRCLE:
+                            scene = 1;
+                            break;
+                        case SCE_CTRL_CROSS:
+                            if(blockCross) break;
+                            
+                            blockCross = true;
+                            break;
+                    }
                 }
             }
         }

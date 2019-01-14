@@ -22,6 +22,15 @@
 #include "utils.h"
 #include "sha1.h"
 
+int doesDirExist(const char* path) { 
+	SceUID dir = sceIoDopen(path); 
+ 	if (dir >= 0) { 
+ 		sceIoDclose(dir); 
+ 		return 1; 
+ 	} else { 
+ 		return 0; 
+ 	} 
+} 
 int allocateReadFile(char *file, void **buffer) {
 	SceUID fd = sceIoOpen(file, SCE_O_RDONLY, 0);
 	if (fd < 0)

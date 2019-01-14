@@ -69,6 +69,12 @@
         "chrono": "cpp",
         "iomanip": "cpp",
         "ratio": "cpp",
-        "utils.h": "c"
+        "utils.h": "c",
+        "main.h": "c",
+        "unzip.h": "c",
+        "unzip.h\u0000unzip.h": "c",
+        "file.h": "c",
+        "stdarg.h": "c",
+        "fcntl.h": "c"
     }
 }

@@ -15,15 +15,14 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <psp2/types.h> 
 
+#include "main.h"
 #include "package_installer.h"
 #include "archive.h"
 #include "file.h"
 #include "utils.h"
 #include "sfo.h"
 #include "sha1.h"
-#include "psp2/promoterutil.h"
 
 #include "base_head_bin.h"
 
@@ -223,7 +222,7 @@ int makeHeadBin() {
 	char titleid[12];
 	memset(titleid, 0, sizeof(titleid));
 	getSfoString(sfo_buffer, "TITLE_ID", titleid, sizeof(titleid));
-	
+
 	// Get content id
 	char contentid[48];
 	memset(contentid, 0, sizeof(contentid));
@@ -306,7 +305,6 @@ int installPackage(char *file) {
 	if (res < 0)
 		return res;
 
-	printf("\nDone! The homebrew is now installed\n");
-
 	return 0;
 }
+

@@ -3,8 +3,6 @@
 #include <string>
 #include <fstream>
 
-#include "vpkInstaller/package_installer.h"
-
 using namespace std;
 
 string formatLongDesc(string str) {
@@ -32,32 +30,6 @@ string formatLongDesc(string str) {
         }
     }
     return sentance;
-}
-
-void addKernelPL(string plName, string &taiConfig, string taiConfigPath) {
-    taiConfig += ("\n*KERNEL\n"+taiConfigPath+plName);
-}
-
-void installVPK(string vpkPath) {
-    char * writable = new char[vpkPath.size() + 1];
-    std::copy(vpkPath.begin(), vpkPath.end(), writable);
-    writable[vpkPath.size()] = '\0';
-
-    installPackage(writable);
-
-    delete[] writable;
-}
-
-void installPL(string plName, string &taiConfig, string taiConfigPath) {
-    if(plName.find(".zip") != string::npos) {
-    }
-    if(plName.find(".skprx") != string::npos) {
-        addKernelPL(plName, taiConfig, taiConfigPath);
-    }
-
-    ofstream tat(taiConfigPath+"config.txt");
-    tat << taiConfig;
-    tat.close();
 }
 
 int doesDirExist(const char* path) { 

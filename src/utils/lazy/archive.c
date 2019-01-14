@@ -27,7 +27,7 @@ static int archive_path_start = 0;
 static unzFile uf = NULL;
 static FileList archive_list;
 
-int fileListGetArchiveEntries(FileList *list, char *path) {
+int fileListGetArchiveEntries(FileList *list, const char *path) {
 	int res;
 
 	if (!uf)
@@ -133,7 +133,7 @@ int getArchivePathInfo(char *path, uint64_t *size, uint32_t *folders, uint32_t *
 	return 0;
 }
 
-int extractArchivePath(char *src, char *dst, FileProcessParam *param) {
+int extractArchivePath(const char *src, const char *dst, FileProcessParam *param) {
 	if (!uf)
 		return -1;
 

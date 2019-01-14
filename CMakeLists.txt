@@ -49,21 +49,25 @@ link_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+file(GLOB bigLazy
+    "src/utils/lazy/*.c"
+    "src/utils/lazy/*.h"
+)
+
+file(GLOB minizip
+    "src/utils/minizip/*.c"
+    "src/utils/minizip/*.h"
+)
+
 ## Build and link
 # Add all the files needed to compile here
 add_executable(easyplugin
+    ${minizip}
+    ${vitaShell}
     src/main.cpp
     src/net/download.cpp
     src/utils/search.cpp
     src/utils/format.cpp
-    src/utils/minizip/unzip.c
-    src/utils/minizip/ioapi.c
-    src/utils/vpkInstaller/archive.c
-    src/utils/vpkInstaller/file.c
-    src/utils/vpkInstaller/package_installer.c
-    src/utils/vpkInstaller/sfo.c
-    src/utils/vpkInstaller/sha1.c
-    src/utils/vpkInstaller/utils.c
     src/graphics/2dfont.cpp
 )
 
@@ -76,6 +80,7 @@ target_link_libraries(easyplugin
     png
     z
     SceGxm_stub
+    SceSqlite_stub 
     SceCtrl_stub
     SceSysmodule_stub
     SceNet_stub
@@ -89,6 +94,7 @@ target_link_libraries(easyplugin
     ScePower_stub
     SceIme_stub
     SceSysmodule_stub
+    SceShellSvc_stub 
     SceDisplay_stub
     SceCommonDialog_stub
     SceLibKernel_stub
