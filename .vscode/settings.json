@@ -75,6 +75,7 @@
         "unzip.h\u0000unzip.h": "c",
         "file.h": "c",
         "stdarg.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "archive.h": "c"
     }
 }

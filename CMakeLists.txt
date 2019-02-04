@@ -50,20 +50,20 @@ link_directories(
 )
 
 file(GLOB bigLazy
-    "src/utils/lazy/*.c"
+    "src/utils/lazy/*.cpp"
     "src/utils/lazy/*.h"
 )
 
 file(GLOB minizip
-    "src/utils/minizip/*.c"
-    "src/utils/minizip/*.h"
+    "src/utils/lazy/minizip/*.c"
+    "src/utils/lazy/minizip/*.h"
 )
 
 ## Build and link
 # Add all the files needed to compile here
 add_executable(easyplugin
     ${minizip}
-    ${vitaShell}
+    ${bigLazy}
     src/main.cpp
     src/net/download.cpp
     src/utils/search.cpp

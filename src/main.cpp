@@ -13,9 +13,7 @@ using namespace std;
 #include "utils/search.hpp"
 #include "utils/format.hpp"
 
-extern "C" {
-    #include "utils/lazy/archive.h"
-}
+#include "utils/lazy/zip.h"
 
 using json = nlohmann::json;
 
@@ -46,7 +44,7 @@ int main() {
 
     string searchResult = "";
     string longDescription;
-    string plName = "AnalogsEnhancer.skprx";
+    string plName = "AnalogsEnhancer.zip";
     string taiConfig = "";
     string taiConfigPath = "";
 
@@ -174,7 +172,8 @@ int main() {
 
             if(scene == 2) {
                 if(plName.find(".zip") != string::npos) {
-                    extractArchivePath((taiConfigPath+plName).c_str(), (taiConfigPath+"extracted/").c_str(), NULL);
+                    Zipfile zip = Zipfile(taiConfigPath+plName);
+                    zip.Unzip(taiConfigPath+"unzipped/");
                 }
                 else if(plName.find(".suprx")) {
 
@@ -189,6 +188,8 @@ int main() {
                 ofstream tat(taiConfigPath+"config.txt");
                 tat << taiConfig;
                 tat.close();
+
+                scene = 1;
             }
 
             if(scrollDelay <= 1) {
