@@ -59,11 +59,17 @@ file(GLOB minizip
     "src/utils/lazy/minizip/*.h"
 )
 
+file(GLOB screens
+    "src/screens/*.cpp"
+    "src/screens/*.hpp"
+)
+
 ## Build and link
 # Add all the files needed to compile here
 add_executable(easyplugin
     ${minizip}
     ${bigLazy}
+    ${screens}
     src/main.cpp
     src/net/download.cpp
     src/utils/search.cpp

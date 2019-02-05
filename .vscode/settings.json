@@ -76,6 +76,13 @@
         "file.h": "c",
         "stdarg.h": "c",
         "fcntl.h": "c",
-        "archive.h": "c"
+        "archive.h": "c",
+        "iostream": "cpp",
+        "mutex": "cpp",
+        "set": "cpp",
+        "xthread": "cpp",
+        "thread": "cpp",
+        "condition_variable": "cpp",
+        "cstdarg": "cpp"
     }
 }

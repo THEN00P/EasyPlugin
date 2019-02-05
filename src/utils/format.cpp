@@ -1,3 +1,5 @@
+#pragma once
+
 #include <psp2/io/fcntl.h>
 #include <psp2/io/dirent.h> 
 #include <string>
