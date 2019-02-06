@@ -20,12 +20,8 @@ int main() {
     vita2d_set_clear_color(RGBA8(255,255,255,255));
 
     vita2d_texture *bgIMG = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/bg.png");
-
-    // netInit();
-    // httpInit();
-    // curlDownload("http://rinnegatamante.it/vitadb/list_plugins_json.php", "ux0:json.json");
-    // httpTerm();
-    // netTerm();
+    
+    curlDownload("http://rinnegatamante.it/vitadb/list_plugins_json.php", "ux0:data/Easy_Plugins/json.json");
 
     SharedData sharedData;
     

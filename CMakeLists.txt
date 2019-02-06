@@ -49,14 +49,14 @@ link_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-file(GLOB bigLazy
-    "src/utils/lazy/*.cpp"
-    "src/utils/lazy/*.h"
+file(GLOB vhbb
+    "src/utils/vhbb/*.cpp"
+    "src/utils/vhbb/*.h"
 )
 
 file(GLOB minizip
-    "src/utils/lazy/minizip/*.c"
-    "src/utils/lazy/minizip/*.h"
+    "src/utils/vhbb/minizip/*.c"
+    "src/utils/vhbb/minizip/*.h"
 )
 
 file(GLOB screens
@@ -68,10 +68,11 @@ file(GLOB screens
 # Add all the files needed to compile here
 add_executable(easyplugin
     ${minizip}
-    ${bigLazy}
+    ${vhbb}
     ${screens}
     src/main.cpp
     src/net/download.cpp
+    src/utils/filesystem.cpp
     src/utils/search.cpp
     src/utils/format.cpp
     src/graphics/2dfont.cpp

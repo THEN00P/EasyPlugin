@@ -1,7 +1,4 @@
-#ifndef __NET_H__
-#define __NET_H__
+#pragma once
 
 void curlDownload(const char *url, const char *dest);
-void curlDownloadKeepName(const char *url);
-
-#endif
+int curlDownloadKeepName(char const*const url);

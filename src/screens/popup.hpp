@@ -17,6 +17,6 @@ class Popup {
         int dir;
         int state = 0;
         string plPath;
-        string plName = "AnalogsEnhancer.zip";
+        string plName = "AutoBoot.zip";
         vector<string> installFiles;
 };
