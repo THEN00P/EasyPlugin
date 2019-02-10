@@ -19,7 +19,7 @@ void handleSuprx(SharedData &SharedData, unsigned int button) {
 
 void Popup::draw(SharedData &sharedData, unsigned int button) {
     if(state == 0) {
-        curlDownloadKeepName(sharedData.plugins[sharedData.cursorY]["url"].get<string>().c_str());
+        plName = curlDownloadKeepName(sharedData.plugins[sharedData.cursorY]["url"].get<string>().c_str());
         installFiles.clear();
         plPath = sharedData.taiConfigPath;
         currentPlugin = 0;

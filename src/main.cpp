@@ -24,7 +24,9 @@ int main() {
 
     vita2d_texture *bgIMG = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/bg.png");
     
-    curlDownload("http://rinnegatamante.it/vitadb/list_plugins_json.php", "ux0:data/Easy_Plugins/json.json");
+    httpInit();
+    netInit();
+    curlDownload("http://rinnegatamante.it/vitadb/list_plugins_json.php", "ux0:data/Easy_Plugins/plugins.json");
 
     SharedData sharedData;
 
@@ -32,11 +34,11 @@ int main() {
     else if(doesDirExist("ur0:tai")) sharedData.taiConfigPath = "ur0:tai/";
     else return 0;
 
+    sharedData.taiConfig = fs.readFile(sharedData.taiConfigPath+"config.txt");
+
     sharedData.plugins = json::parse(fs.readFile("ux0:data/Easy_Plugins/plugins.json"));
 
     sharedData.original = sharedData.plugins;
-
-    sharedData.taiConfig = fs.readFile(sharedData.taiConfigPath+"config.txt");;
 
     List listView;
     Popup popupView;
@@ -68,6 +70,8 @@ int main() {
         }
     }
 
+    httpTerm();
+    netTerm();
     vita2d_free_font(sharedData.font);
     vita2d_free_texture(bgIMG);
     listView.free();

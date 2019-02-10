@@ -108,7 +108,7 @@ target_link_libraries(easyplugin
 )
 
 ## Create Vita files
-vita_create_self(easyplugin.self easyplugin)
+vita_create_self(easyplugin.self easyplugin UNSAFE)
 # The FILE directive lets you add additional files to the VPK, the syntax is 
 # FILE src_path dst_path_in_vpk. In this case, we add the LiveArea paths.
 vita_create_vpk(easyplugin.vpk ${VITA_TITLEID} easyplugin.self
