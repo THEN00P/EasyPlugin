@@ -3,7 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:/Users/Praktikant/AppData/Local/Packages/CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc/LocalState/rootfs/usr/local/vitasdk/arm-vita-eabi/include",
+                "C:/Users/Lorenz/AppData/Local/Packages/CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc/LocalState/rootfs/usr/local/vitasdk/arm-vita-eabi/include",
                 "${workspaceFolder}/**"
             ],
             "defines": [

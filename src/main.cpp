@@ -6,6 +6,7 @@
 
 #include "main.hpp"
 #include "net/download.hpp"
+#include "utils/filesystem.hpp"
 #include "utils/search.hpp"
 #include "utils/format.hpp"
 
@@ -16,6 +17,8 @@
 SceCtrlData pad;
 
 int main() {
+    Filesystem fs;
+
     vita2d_init();
     vita2d_set_clear_color(RGBA8(255,255,255,255));
 
@@ -24,20 +27,16 @@ int main() {
     curlDownload("http://rinnegatamante.it/vitadb/list_plugins_json.php", "ux0:data/Easy_Plugins/json.json");
 
     SharedData sharedData;
-    
-    ifstream plp("ux0:data/Easy_Plugins/plugins.json");
-    plp >> sharedData.plugins;
-    plp.close();
-
-    sharedData.original = sharedData.plugins;
-
-    ifstream blb(sharedData.taiConfigPath+"config.txt");
-    blb >> sharedData.taiConfig;
-    blb.close();
 
     if(doesDirExist("ux0:tai")) sharedData.taiConfigPath = "ux0:tai/";
     else if(doesDirExist("ur0:tai")) sharedData.taiConfigPath = "ur0:tai/";
     else return 0;
+
+    sharedData.plugins = json::parse(fs.readFile("ux0:data/Easy_Plugins/plugins.json"));
+
+    sharedData.original = sharedData.plugins;
+
+    sharedData.taiConfig = fs.readFile(sharedData.taiConfigPath+"config.txt");;
 
     List listView;
     Popup popupView;

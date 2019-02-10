@@ -1,5 +1,9 @@
 #pragma once
 
+#include <psp2/io/stat.h>
+#include <psp2/io/dirent.h>
+#include <psp2/io/fcntl.h>
+
 #define SCE_ERROR_ERRNO_EEXIST 0x80010011
 #define MAX_PATH_LENGTH 1024
 
@@ -22,9 +26,10 @@ typedef struct SfoEntry {
   uint32_t dataofs;
 } __attribute__((packed)) SfoEntry;
 
-
 class Filesystem {
     public:
+        std::string readFile(std::string file);
+        int writeFile(std::string file, std::string buf);
         int copyFile(std::string src, std::string dst);
         int copyPath(std::string src, std::string dst);
         int removePath(std::string path);

@@ -3,6 +3,8 @@
 #include <psp2/io/dirent.h>
 #include <vector>
 
+#include "../utils/filesystem.hpp"
+
 #include "../main.hpp"
 
 class Popup {
@@ -19,4 +21,5 @@ class Popup {
         string plPath;
         string plName = "AutoBoot.zip";
         vector<string> installFiles;
+        Filesystem fs;
 };

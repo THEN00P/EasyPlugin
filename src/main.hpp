@@ -2,7 +2,7 @@
 
 #include <vita2d.h>
 #include <psp2/ctrl.h>
-#include <fstream>
+#include <psp2/kernel/clib.h>
 
 #include "utils/json.hpp"
 

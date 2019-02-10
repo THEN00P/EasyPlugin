@@ -1,13 +1,41 @@
-#include <psp2/io/stat.h>
-#include <psp2/io/dirent.h>
-#include <psp2/io/fcntl.h>
-
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 #include <string>
 
 #include "filesystem.hpp"
+
+std::string Filesystem::readFile(std::string file) {
+  int fd = sceIoOpen(file.c_str(), SCE_O_RDONLY, 0777);
+
+  int fileSize = sceIoLseek ( fd, 0, SCE_SEEK_END );
+  sceIoLseek (fd, 0, SCE_SEEK_SET ); // reset 'cursor' in file
+
+  if (fd < 0)
+    return "";
+
+  std::string readString(fileSize, '\0');
+  sceIoRead(fd, &readString[0], fileSize);
+
+  sceIoClose(fd);
+
+  return readString;
+}
+
+int Filesystem::writeFile(std::string file, std::string buf) {
+  int fd = sceIoOpen(file.c_str(), SCE_O_WRONLY | SCE_O_CREAT, 0777);
+
+  int fileSize = sceIoLseek ( fd, 0, SCE_SEEK_END );
+  sceIoLseek (fd, 0, SCE_SEEK_SET ); // reset 'cursor' in file
+
+  if (fd < 0)
+    return fd;
+
+  int written = sceIoWrite(fd, buf.c_str(), buf.length());
+
+  sceIoClose(fd);
+  return written;
+}
 
 int Filesystem::copyFile(std::string src, std::string dst) {
 

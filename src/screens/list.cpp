@@ -9,6 +9,12 @@ void List::draw(SharedData &sharedData, unsigned int button) {
     scrollThumbHeight = 504*scrollPercent;
 
     scrollThumbY = scrollY*scrollPercent;
+    
+    if(button == NULL) {
+        scrollDelay = 0; 
+        scrollStage = 0;
+    }
+    
     if(scrollDelay >= 0) scrollDelay--;
 
     vita2d_draw_rectangle(950, scrollThumbY, 10, scrollThumbHeight, RGBA8(0,0,0,150));
