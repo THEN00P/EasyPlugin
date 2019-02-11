@@ -59,8 +59,8 @@ void httpTerm() {
 }
 
 static size_t write_data_to_disk(void *ptr, size_t size, size_t nmemb, void *stream){
-  size_t written = sceIoWrite(   *(int*) stream , ptr , size*nmemb);
-  return written;
+    size_t written = sceIoWrite(   *(int*) stream , ptr , size*nmemb);
+    return written;
 }
 
 void curlDownload(const char *url, const char *dest) {
@@ -86,179 +86,13 @@ void curlDownload(const char *url, const char *dest) {
 	curl_global_cleanup();
 }
 
-
-//  __   __         
-//  \ \ / /__ _ __  
-//   \ V / _ \ '_ \ 
-//    | |  __/ |_) |
-//    |_|\___| .__/ 
-//           |_|  
-// dhhhddyydhhhhhhhyyyyyyyyyyyyysssoo+//osso+++/:/+yddmmmmmmmmdddddddddddddddhyysoooooooosssooooooooo/.
-// dhhhhyyhyyyssssssooo++/////////////::://///+ohdmmmmmmmmmmddddddddhdddddddddddddhhssoooooooooooooo+/.
-// +////++////////////++++o++++osssssysysssyhdmmmmmmmdddddhhyyssosossoosssyyyyhhhdddddhsooooooooooooo+-
-// yyyyyyyyysyyyy+///syyyyyyyyyyyyyyyyyyyhddmmmmmmddhysooo+//::-------------::///osshhhhhyoooooo++++/:-
-// hhyyhhhhhhhhyyo///yyyyyyyyyyyyyyyyyyyhdmmmmmmdddyo+///::::---------------------::/+shhhs:----.....``
-// yyyyhhhhhhhhyyo///syyyyyyyyyyyyyyyyyddmddddddddhs+/::::--------........---------::://shh+...........
-// yyyyyyyyyyyyyys///+yyyyysssssooo+oydddmmdddddhhys+/:::-----------.----------------:::/ohs+/++++++++/
-// ++/+//////////////////////::::///+hddmmddddhhhyyo/:::----------------------.------::://oysoooooooooo
-// oo+++++++++ooooooossssssssssyyyyydddmdddddhyyso+/:::::----.....................---::://+syoooooo++++
-// yyyyyyyyyyyyyyyyyyyyyyssyyyssssyhmdddddddhyo+/:::::::::----.....````````..```......--://oy/::----...
-// yyyyyyyyyssyyyysyyyyysssyyyssssydddddddddho//:::://:----......----..```````````....--::/oy:------...
-// yyyyyyyyyssyyyyyysyyyyssssssssshddddddddhs+/:------:::-:--------......````...---::::::/+ss+////+++//
-// sssssssssysssssssssooo+++++/+yhoo+oyhdddy+/:----.--:/+///+//.-:::----.....----.....----:ooo+++++o+++
-// +///////+++/+++++/:::::::/+oydo::/::/yhy+/::------:::---....--------------::---/:/::///+++ooo+++++++
-// yyyyyssyyyssssyysyo:::://oyydd/-:/::/ohs///:::---::::--.......------------:/:---:::-/o//++++++++++++
-// yyyyyyyyyyyyyyyyyyo:::+ssssyhdo-::---+yo////::--------------.......---...--:/:------::-:///::///////
-// hyyyyyyyyyyyyyyyyss:::osssssydh::---:os+////::-:----..........``--:---....--:-..----::::-...........
-// yyyyyyyyyysyysyssso/::/osooooydy:://:o+/::/+/:::---...`````...`----.....``..:-.`....-:::...........-
-// oo+++/+++++///////::::::::::/sddy//:/o//::/+/::----..`````..```.--....-.....--.````..-:/::///:::/+++
-// ///+++++++++++++++++oossyhdddmdhyo/:/o//:://:------..````````...........-----.``````..-/++oooo+o++++
-// ++sssssssssoooossyyhdddmmmmmmmdys+//oo//////:-----...................--..------..``...:+o+oooooooooo
-// /+yyyysssso+oshdddmmmmmmmmmmmmdyo+/+so+/////:-----..........-----::::::::::::---.....-/++++ooooo++++
-// ++osyyssyyyhdddddmmmmmmmmmmmmmdho+++s+//////:-----.......---:::///:::::////++:-.....-////++++++o++++
-// +/+oyhddddddddddddmmmmmmmmmmmmmds+/+o+//////::-----.................------:::-..``.-/sssssssssssssss
-// yhdmmdddddddddddddmmmmmmmmmdmmmdh+//++///////::-----................----..-::-....:ohhhyssoooooooooo
-// mmmmmmddddddddddddmmmmmmmmmmmmmmdy+/////////+/::------..........``.......--:----:oydddddddhyssooooo+
-// mmmmmmdddddddddddmmmmmmmmmmmmmmmmds//:////////+//:::::--........`.......----::/oyddddddddddddddhysoo
-// mmmmmmdddddddddddddmmmmmmmmmmmmmmmdy+:::::////////////:::---............--:/oshdddddddddddddddddddho
-// mmmmmmddddddddddddmmmmmmmmmmmmmmmmmddo::---:::///++++//////::---------:::/oyhddddddddddddddddddddddd
-// mmmmmmmddddddddddddmmmmmmmmmmmmmmmmmmdho::-----::///+++o++/////:/::///+syhdddddddddddddddddddddddddd
-// mmmmmmmddddddddddddmmmmmmmmmmmmmmmmmmdddho/:-------::///++++oooooooossyhdddddddddddddddddddddddddddd
-// Nmmmmmmdddddddddddddmmmmmmmmmmmmmmmmmmmmdddy+:-----------::::////++++oyddddddddddddddddddddddddddddd
-// mmmmmmmmdddddddddddmmmmmmmmmmmmmmmmmmmmddddddds/-------------:::://+sohddddddddddddddddddddddddddddd
-// mmmmmmmmddddddddddddmmmmmmmmmmmmmmmmmmmmmmmdddddhs+:-----::::::://+sydddddddddddddddddddddddddddddmm
-// mmmmmmmmmddddddddddddmmmmmmmmmmmmmmmmmmmmmmmddddddddhso+//////+oshddddddddddddddddddddddddddddddmmNM
-// NmmmmmmmmmdddddddddddmmmmmmmmmmmmmmmmmmmmmmmdddddmdddddddddddddddddddddddddddddddddddddddddddddmNMMM
-// NNmmmmmmmmddddddddddmmmmmmddmmmmmmmmmmmmmmmmmmmmmmdddmmmmmmdddddddddddddddddddddddddddddddddddmmNMMM
-// NNmmmmmmmmmddddddddmmmmmmmmmmmmmmmmmmmmmmmmmmmmddddmmmmmmmmmmdddddddddddddddddddddddddddddddddmNMMMM
-// NNmmmmmmmmmdddddddddmmmmmmmmmmmmmmmmmmmmmmmmmddmmmmmmmmdmddmmdddddddddddddddddddddddddddddddddmNMMMM
-//   ___ _____ _ ____    ____ _____  _    ____ _  _______     _______ ____  _____ _     _____        __
-//  |_ _|_   _( ) ___|  / ___|_   _|/ \  / ___| |/ / _ \ \   / / ____|  _ \|  ___| |   / _ \ \      / /
-//   | |  | | |/\___ \  \___ \ | | / _ \| |   | ' / | | \ \ / /|  _| | |_) | |_  | |  | | | \ \ /\ / / 
-//   | |  | |    ___) |  ___) || |/ ___ \ |___| . \ |_| |\ V / | |___|  _ <|  _| | |__| |_| |\ V  V /  
-//  |___| |_|   |____/  |____/ |_/_/   \_\____|_|\_\___/  \_/  |_____|_| \_\_|   |_____\___/  \_/\_/                                                                        
-
-//i have almost no idea how this works
-typedef struct {
-    char        dnld_remote_fname[4096];
-    char        dnld_url[4096]; 
-    int        dnld_stream;
-    int        dbg_stream;
-    uint64_t    dnld_file_sz;
-} dnld_params_t;
-
-static int get_oname_from_cd(char const*const cd, char *oname)
-{
-    char    const*const cdtag   = "Content-disposition:";
-    char    const*const key     = "filename=";
-    int     ret                 = 0;
-    char    *val                = NULL;
-
-    /* Example Content-Disposition: filename=name1367; charset=funny; option=strange */
-
-    /* If filename is present */
-    strcasestr(cd, key);
-
-    /* Move to value */
-    val += strlen(key);
-
-    /* Copy value as oname */
-    while (*val != '\0' && *val != ';') {
-        //printf (".... %c\n", *val);
-        *oname++ = *val++;
-    }
-    *oname = '\0';
-}
-
-static int get_oname_from_url(char const* url, char *oname)
-{
-    int         ret = 0;
-    char const  *u  = url;
-
-    /* Remove "http(s)://" */
-    u = strstr(u, "://");
-    if (u) {
-        u += strlen("://");
-    }
-
-    u = strrchr(u, '/');
-
-    /* Remove last '/' */
-    u++;
-
-    /* Copy value as oname */
-    while (*u != '\0') {
-        //printf (".... %c\n", *u);
-        *oname++ = *u++;
-    }
-    *oname = '\0';
-
-    return ret;
-}
-
-size_t dnld_header_parse(void *hdr, size_t size, size_t nmemb, void *userdata)
-{
-    const   size_t  cb      = size * nmemb;
-    const   char    *hdr_str= (char *)hdr;
-    dnld_params_t *dnld_params = (dnld_params_t*)userdata;
-
-    std::string ret = dnld_params->dnld_remote_fname;
-
-    
-    
-    Filesystem fs;
-
-    fs.writeFile("ux0:data/Easy_Plugins/log.txt", static_cast<std::string>((char *)userdata));
-
-    
-
-    return cb;
-}
-
-int get_dnld_stream(char const*const fname)
-{
-    char const*const pre = "ux0:tai/";
-    char out[4096];
-
-    snprintf(out, sizeof(out), "%s/%s", pre, fname);
-
-    int fp = sceIoOpen(out, SCE_O_CREAT | SCE_O_WRONLY, 0777);
-
-    return fp;
-}
-
-size_t write_cb(void *buffer, size_t sz, size_t nmemb, void *userdata)
-{
-    int ret = 0;
-    dnld_params_t *dnld_params = (dnld_params_t*)userdata;
-
-    if (!dnld_params->dnld_remote_fname[0]) {
-        ret = get_oname_from_url(dnld_params->dnld_url, dnld_params->dnld_remote_fname);
-    }
-
-    if (!dnld_params->dnld_stream) {
-        dnld_params->dnld_stream = get_dnld_stream(dnld_params->dnld_remote_fname);
-    }
-
-    ret = sceIoWrite(dnld_params->dnld_stream, buffer, sz*nmemb);
-    if (ret == (sz*nmemb)) {
-       dnld_params->dnld_file_sz += ret;
-    }
-    return ret;
-}
-
-
-char *curlDownloadKeepName(char const*const url)
-{
+std::string curlDownloadKeepName(char const*const url, std::string dst) {
     CURL        *curl;
-    dnld_params_t dnld_params;
 
-    memset(&dnld_params, 0, sizeof(dnld_params));
-    strncpy(dnld_params.dnld_url, url, strlen(url));
+    SceUID file = sceIoOpen("ux0:data/Easy_Plugins/plugin.tmp", SCE_O_CREAT | SCE_O_WRONLY, 0777);
+    SceUID head = sceIoOpen("ux0:data/Easy_Plugins/head.tmp", SCE_O_CREAT | SCE_O_WRONLY, 0777);
 
     Filesystem fs;
-
-    fs.writeFile("ux0:data/Easy_Plugins/log2.txt", static_cast<std::string>(url));
 
     curl = curl_easy_init();
     if (curl) {
@@ -267,17 +101,30 @@ char *curlDownloadKeepName(char const*const url)
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, dnld_header_parse);
-		curl_easy_setopt(curl, CURLOPT_HEADERDATA, &dnld_params);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &dnld_params);
+		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, write_data_to_disk);
+		curl_easy_setopt(curl, CURLOPT_HEADERDATA, &head);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data_to_disk);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &file);
+
+        curl_easy_perform(curl);
     }
 
+    sceIoClose(file);
+    sceIoClose(head);
 
-    curl_easy_perform(curl);
+    std::string header = fs.readFile("ux0:data/Easy_Plugins/head.tmp");
 
+    header = header.substr(header.find("filename=\"")+10);
+
+    header = header.substr(0, header.find("\""));
+
+    fs.copyFile("ux0:data/Easy_Plugins/plugin.tmp", dst+header);
+
+    sceIoRemove("ux0:data/Easy_Plugins/plugin.tmp");
+    sceIoRemove("ux0:data/Easy_Plugins/head.tmp");
+    
     curl_easy_cleanup(curl);
 	curl_global_cleanup();
 
-    return dnld_params.dnld_remote_fname;
+    return header;
 }

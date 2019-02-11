@@ -32,7 +32,7 @@ int main() {
 
     if(doesDirExist("ux0:tai")) sharedData.taiConfigPath = "ux0:tai/";
     else if(doesDirExist("ur0:tai")) sharedData.taiConfigPath = "ur0:tai/";
-    else return 0;
+    else return -1;
 
     sharedData.taiConfig = fs.readFile(sharedData.taiConfigPath+"config.txt");
 

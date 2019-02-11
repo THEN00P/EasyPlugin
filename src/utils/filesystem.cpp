@@ -22,11 +22,17 @@ std::string Filesystem::readFile(std::string file) {
   return readString;
 }
 
+bool Filesystem::fileExists(std::string path) {
+  if(int fd = sceIoOpen(path.c_str(), SCE_O_RDONLY, 0777)) {
+    sceIoClose(fd);
+    return true
+  } else {
+    return false;
+  }
+}
+
 int Filesystem::writeFile(std::string file, std::string buf) {
   int fd = sceIoOpen(file.c_str(), SCE_O_WRONLY | SCE_O_CREAT, 0777);
-
-  int fileSize = sceIoLseek ( fd, 0, SCE_SEEK_END );
-  sceIoLseek (fd, 0, SCE_SEEK_SET ); // reset 'cursor' in file
 
   if (fd < 0)
     return fd;

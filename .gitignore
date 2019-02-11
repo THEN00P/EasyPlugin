@@ -49,7 +49,7 @@ CMakeCache.txt
 *.cmake
 
 # vscode
-.vscode
+.vscode/
 
 # project specific
 easyplugin

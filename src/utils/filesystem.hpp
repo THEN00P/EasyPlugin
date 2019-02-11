@@ -33,6 +33,7 @@ class Filesystem {
         int copyFile(std::string src, std::string dst);
         int copyPath(std::string src, std::string dst);
         int removePath(std::string path);
+        bool fileExists(std::string path);
     private:
         bool hasEndSlash(std::string str);
 };

@@ -5,4 +5,4 @@ void netTerm();
 void httpInit();
 void httpTerm();
 void curlDownload(const char *url, const char *dest);
-char *curlDownloadKeepName(char const*const url);
+std::string curlDownloadKeepName(char const*const url, std::string dst);

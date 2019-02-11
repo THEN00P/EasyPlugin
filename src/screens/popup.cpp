@@ -19,12 +19,14 @@ void handleSuprx(SharedData &SharedData, unsigned int button) {
 
 void Popup::draw(SharedData &sharedData, unsigned int button) {
     if(state == 0) {
-        plName = curlDownloadKeepName(sharedData.plugins[sharedData.cursorY]["url"].get<string>().c_str());
+        plName = curlDownloadKeepName(sharedData.plugins[sharedData.cursorY]["url"].get<string>().c_str(), sharedData.taiConfigPath);
         installFiles.clear();
+        archive = false;
         plPath = sharedData.taiConfigPath;
         currentPlugin = 0;
 
         if(plName.find(".zip") != string::npos) {
+            archive = true;
             Zipfile zip = Zipfile(sharedData.taiConfigPath+plName);
             zip.Unzip(sharedData.taiConfigPath+"unzipped/");
 
@@ -64,16 +66,13 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
     }
 
     if(state == 1) {
-        if(installFiles[currentPlugin].find("data") != string::npos) {
-            fs.copyPath(plPath+"/data", "ux0:data");
-            currentPlugin++;
-        }
-        else if(installFiles[currentPlugin].find(".txt") != string::npos ||
+        if(installFiles[currentPlugin].find(".txt") != string::npos ||
         installFiles[currentPlugin].find(".cfg") != string::npos) {
             fs.copyFile(plPath+installFiles[currentPlugin], "ux0:tai/"+installFiles[currentPlugin]);
             currentPlugin++;
         }
-        else if(installFiles[currentPlugin].find(".skprx") != string::npos) {
+        else if(installFiles[currentPlugin].find(".skprx") != string::npos &&
+        sharedData.taiConfig.find('\n'+installFiles[currentPlugin]+'\n') != string::npos) {
             fs.copyFile(plPath+installFiles[currentPlugin], "ux0:tai/"+installFiles[currentPlugin]);
             sharedData.taiConfig += "*Kernel\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
             currentPlugin++;
@@ -82,8 +81,12 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
             // TODO
             currentPlugin++;
         }
-        else if(installFiles[currentPlugin].find(".suprx") != string::npos) {
+        else if(installFiles[currentPlugin].find(".suprx") != string::npos &&
+        sharedData.taiConfig.find('\n'+installFiles[currentPlugin]+'\n') != string::npos) {
             // TODO
+        }
+        else if(installFiles[currentPlugin].find("data") != string::npos) {
+            fs.copyPath(plPath+"/data", "ux0:data");
             currentPlugin++;
         }
 
@@ -92,6 +95,10 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
 
     if(state == 2) {
         fs.writeFile(sharedData.taiConfigPath+"config.txt", sharedData.taiConfig);
+        if(archive) {
+            fs.removePath(sharedData.taiConfigPath+"unzipped/");
+            sceIoRemove((sharedData.taiConfigPath+plName).c_str());
+        }
 
         sharedData.scene = 0;
     }
