@@ -1,6 +1,5 @@
 #include <psp2/io/dirent.h>
 #include <psp2/io/stat.h>
-#include <psp2/kernel/clib.h>
 
 #include "../main.hpp"
 #include "../utils/vhbb/zip.h"
@@ -13,8 +12,30 @@ string toUppercase(string strToConvert) {
     return strToConvert;
 }
 
-void handleSuprx(SharedData &SharedData, unsigned int button) {
+int scrollY = 0;
 
+void handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button) {
+    vita2d_draw_rectangle(0, 0, 960, 544, RGBA8(234,234,234,255));
+
+    for(int i=0;i<sharedData.appData.size();i++) {
+        if((i*128)-scrollY>544) break;
+        if((i*128)-scrollY<0) continue;
+
+        vita2d_draw_texture(sharedData.appData[i].icon, 10, (i*128)+48-scrollY);
+        vita2d_font_draw_textf(sharedData.font, 80, (i*128)+48-scrollY, RGBA8(16,16,16,255), 32, "%s", sharedData.appData[i].title);
+    }
+
+    switch(button) {
+        case SCE_CTRL_DOWN:
+            scrollY++;
+            break;
+        case SCE_CTRL_UP:
+            scrollY--;
+            break;
+        case SCE_CTRL_CROSS:
+            currentPlugin++;
+            break;
+    }
 }
 
 void Popup::draw(SharedData &sharedData, unsigned int button) {
@@ -68,13 +89,13 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
     if(state == 1) {
         if(installFiles[currentPlugin].find(".txt") != string::npos ||
         installFiles[currentPlugin].find(".cfg") != string::npos) {
-            fs.copyFile(plPath+installFiles[currentPlugin], "ux0:tai/"+installFiles[currentPlugin]);
+            fs.copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
             currentPlugin++;
         }
         else if(installFiles[currentPlugin].find(".skprx") != string::npos &&
-        sharedData.taiConfig.find('\n'+installFiles[currentPlugin]+'\n') != string::npos) {
-            fs.copyFile(plPath+installFiles[currentPlugin], "ux0:tai/"+installFiles[currentPlugin]);
-            sharedData.taiConfig += "*Kernel\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
+        sharedData.taiConfig.find("\n"+installFiles[currentPlugin]) != string::npos) {
+            fs.copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
+            sharedData.taiConfig += "\n\n*Kernel\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
             currentPlugin++;
         }
         else if(installFiles[currentPlugin].find(".vpk") != string::npos) {
@@ -82,15 +103,16 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
             currentPlugin++;
         }
         else if(installFiles[currentPlugin].find(".suprx") != string::npos &&
-        sharedData.taiConfig.find('\n'+installFiles[currentPlugin]+'\n') != string::npos) {
-            // TODO
+        sharedData.taiConfig.find("\n"+installFiles[currentPlugin]) != string::npos) {
+            handleSuprx(sharedData, currentPlugin, button);
+            currentPlugin++;
         }
         else if(installFiles[currentPlugin].find("data") != string::npos) {
             fs.copyPath(plPath+"/data", "ux0:data");
             currentPlugin++;
         }
 
-        if(currentPlugin == installFiles.size()) state = 2;
+        if(currentPlugin == installFiles.size()-1) state = 2;
     }
 
     if(state == 2) {

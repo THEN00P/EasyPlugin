@@ -5,6 +5,33 @@
 
 #include "filesystem.hpp"
 
+std::string getSfoString(const char *path, const char *name) {
+  char *buffer;
+
+  SceUID fd = sceIoOpen(path, SCE_O_RDONLY, 0777);
+
+  int fileSize = sceIoLseek ( fd, 0, SCE_SEEK_END );
+  sceIoLseek (fd, 0, SCE_SEEK_SET ); // reset 'cursor' in file
+
+  sceIoRead(fd, buffer, fileSize);
+
+  SfoHeader *header = (SfoHeader *)buffer;
+  SfoEntry *entries = (SfoEntry *)((uint32_t)buffer + sizeof(SfoHeader));
+
+  if (header->magic != SFO_MAGIC)
+    return "Sfo magic not found";
+
+  int i;
+  for (i = 0; i < header->count; i++) {
+    if (strcmp(buffer + header->keyofs + entries[i].nameofs, name) == 0) {
+      return std::string(buffer + header->valofs + entries[i].dataofs);
+      sceIoClose(fd);
+    }
+  }
+
+  return "Sfo string not found";
+}
+
 std::string Filesystem::readFile(std::string file) {
   int fd = sceIoOpen(file.c_str(), SCE_O_RDONLY, 0777);
 
@@ -25,7 +52,7 @@ std::string Filesystem::readFile(std::string file) {
 bool Filesystem::fileExists(std::string path) {
   if(int fd = sceIoOpen(path.c_str(), SCE_O_RDONLY, 0777)) {
     sceIoClose(fd);
-    return true
+    return true;
   } else {
     return false;
   }

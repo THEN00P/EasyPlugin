@@ -16,6 +16,27 @@
 
 SceCtrlData pad;
 
+vector<AppInfo> getAppData() {
+    vector<AppInfo> ret;
+
+    SceIoDirent dirInfo;
+    SceUID folder;
+
+    AppInfo app;
+
+    if( (folder = sceIoDopen( "ur0:appmeta/" )) != NULL) {
+        while (sceIoDread(folder, &dirInfo) != NULL) {
+            app.appID = dirInfo.d_name;
+            app.title = "name";
+            app.icon = vita2d_load_PNG_file(("ur0:appmeta/"+app.appID+"/icon0.png").c_str());
+
+            ret.push_back(app);
+        }
+    }
+
+    return ret;
+}
+
 int main() {
     Filesystem fs;
 
@@ -37,6 +58,8 @@ int main() {
     sharedData.taiConfig = fs.readFile(sharedData.taiConfigPath+"config.txt");
 
     sharedData.plugins = json::parse(fs.readFile("ux0:data/Easy_Plugins/plugins.json"));
+
+    sharedData.appData = getAppData();
 
     sharedData.original = sharedData.plugins;
 
@@ -69,6 +92,8 @@ int main() {
             scePowerRequestColdReset();
         }
     }
+
+    for(int i=0;i<sharedData.appData.size();i++) vita2d_free_texture(sharedData.appData[i].icon);
 
     httpTerm();
     netTerm();

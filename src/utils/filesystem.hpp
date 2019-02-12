@@ -26,9 +26,14 @@ typedef struct SfoEntry {
   uint32_t dataofs;
 } __attribute__((packed)) SfoEntry;
 
+#define SFO_MAGIC 0x46535000
+
+std::string getSfoString(const char *path, const char *name);
+
 class Filesystem {
     public:
         std::string readFile(std::string file);
+        static int log(std::string log);
         int writeFile(std::string file, std::string buf);
         int copyFile(std::string src, std::string dst);
         int copyPath(std::string src, std::string dst);
