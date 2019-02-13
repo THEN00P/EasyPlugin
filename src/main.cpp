@@ -26,13 +26,15 @@ vector<AppInfo> getAppData() {
 
     if( (folder = sceIoDopen( "ur0:appmeta/" )) != NULL) {
         while (sceIoDread(folder, &dirInfo) != NULL) {
-            app.appID = dirInfo.d_name;
+            app.appID = string(dirInfo.d_name);
             app.title = "name";
             app.icon = vita2d_load_PNG_file(("ur0:appmeta/"+app.appID+"/icon0.png").c_str());
 
             ret.push_back(app);
         }
     }
+
+    sceIoDclose(folder);
 
     return ret;
 }
@@ -81,6 +83,8 @@ int main() {
         if(sharedData.scene == 1) detailsView.draw(sharedData, pad.buttons);
 
         if(sharedData.scene == 2) popupView.draw(sharedData, pad.buttons);
+
+        vita2d_font_draw_textf(sharedData.font, 20, 20, RGBA8(255,255,255,255), 32, "%s", sharedData.appData[0].appID.c_str());
 
         vita2d_end_drawing();
         vita2d_swap_buffers();

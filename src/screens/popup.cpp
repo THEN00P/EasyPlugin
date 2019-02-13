@@ -93,7 +93,7 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
             currentPlugin++;
         }
         else if(installFiles[currentPlugin].find(".skprx") != string::npos &&
-        sharedData.taiConfig.find("\n"+installFiles[currentPlugin]) != string::npos) {
+        sharedData.taiConfig.find(installFiles[currentPlugin]) == string::npos) {
             fs.copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
             sharedData.taiConfig += "\n\n*Kernel\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
             currentPlugin++;
@@ -103,9 +103,8 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
             currentPlugin++;
         }
         else if(installFiles[currentPlugin].find(".suprx") != string::npos &&
-        sharedData.taiConfig.find("\n"+installFiles[currentPlugin]) != string::npos) {
+        sharedData.taiConfig.find(installFiles[currentPlugin]) == string::npos) {
             handleSuprx(sharedData, currentPlugin, button);
-            currentPlugin++;
         }
         else if(installFiles[currentPlugin].find("data") != string::npos) {
             fs.copyPath(plPath+"/data", "ux0:data");
@@ -118,7 +117,7 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
     if(state == 2) {
         fs.writeFile(sharedData.taiConfigPath+"config.txt", sharedData.taiConfig);
         if(archive) {
-            fs.removePath(sharedData.taiConfigPath+"unzipped/");
+            fs.removePath(plPath);
             sceIoRemove((sharedData.taiConfigPath+plName).c_str());
         }
 
