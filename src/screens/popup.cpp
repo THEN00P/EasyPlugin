@@ -6,35 +6,84 @@
 #include "../net/download.hpp"
 #include "popup.hpp"
 
+#define columnHeight = 168;
+
 string toUppercase(string strToConvert) {
     std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
 
     return strToConvert;
 }
 
+int selected = 0;
+int alpha = 200;
+int velocity = 5;
 int scrollY = 0;
+int scrollDelay = 0;
+int scrollStage = 0;
 
 void handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button) {
     vita2d_draw_rectangle(0, 0, 960, 544, RGBA8(234,234,234,255));
 
-    for(int i=0;i<sharedData.appData.size();i++) {
-        if((i*128)-scrollY>544) break;
-        if((i*128)-scrollY<0) continue;
+    //TODO
+    if(alpha > 230) velocity -= 0.1;
+    if(alpha < 20) velocity += 0.1;
 
-        vita2d_draw_texture(sharedData.appData[i].icon, 10, (i*128)+48-scrollY);
-        vita2d_font_draw_textf(sharedData.font, 80, (i*128)+48-scrollY, RGBA8(16,16,16,255), 32, "%s", sharedData.appData[i].title);
+    alpha += velocity;
+
+    if(scrollDelay >= 0) scrollDelay--;
+    if(button == NULL) {
+        scrollDelay = 0; 
+        scrollStage = 0;
+    }
+    
+    if(selected*168 > scrollY+374) scrollY += 168;
+    if(selected*168 < scrollY) scrollY -= 168;
+
+    vita2d_draw_rectangle(0, (selected*168)+20-scrollY, 960, 128, RGBA8(70,211,207,alpha));
+
+    for(int i=0;i<sharedData.appData.size();i++) {
+
+        if((i*168)-scrollY>544) break;
+        if((i*168)+178-scrollY<0) continue;
+
+        if(sharedData.appData[i].icon != NULL)
+        vita2d_draw_texture(sharedData.appData[i].icon, 40, (i*168)+20-scrollY);
+        else vita2d_draw_rectangle(40, (i*168)+20-scrollY, 128, 128, RGBA8(255,255,255,255));
+        
+        vita2d_font_draw_textf(sharedData.font, 170, (i*168)+80-scrollY, RGBA8(16,16,16,255), 32, "%s", sharedData.appData[i].title.c_str());
     }
 
-    switch(button) {
-        case SCE_CTRL_DOWN:
-            scrollY++;
-            break;
-        case SCE_CTRL_UP:
-            scrollY--;
-            break;
-        case SCE_CTRL_CROSS:
-            currentPlugin++;
-            break;
+    if(scrollDelay <= 1) {
+        if(scrollDelay == 0) scrollStage = 0;
+        switch(button) {
+            case SCE_CTRL_CROSS:
+                if(!sharedData.blockCross) currentPlugin++;
+                break;
+            case SCE_CTRL_DOWN:
+                if(selected >= sharedData.appData.size()-1) break;
+
+                if(scrollStage <= 10) {
+                    if(scrollDelay == 1) scrollStage++;
+                    scrollDelay = 10;
+                }
+                else {
+                    scrollDelay = 3;
+                }
+                selected++;
+                break;
+            case SCE_CTRL_UP:
+                if(selected <= 0) break;
+
+                if(scrollStage <= 10) {
+                    if(scrollDelay == 1) scrollStage++;
+                    scrollDelay = 10;
+                }
+                else {
+                    scrollDelay = 3;
+                }
+                selected--;
+                break;
+        }
     }
 }
 
@@ -70,6 +119,7 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
                     (static_cast<string>(dirStruct.d_name).find(".txt") != string::npos &&
                     toUppercase(static_cast<string>(dirStruct.d_name)).find("INSTALL.TXT") == string::npos &&
                     toUppercase(static_cast<string>(dirStruct.d_name)).find("README.TXT") == string::npos)) {
+                        if(sharedData.taiConfig.find("\n"+static_cast<string>(dirStruct.d_name)) == string::npos)
                         installFiles.push_back(static_cast<string>(dirStruct.d_name));
                     }
                 }
@@ -80,6 +130,7 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
         plName.find(".suprx") != string::npos ||
         plName.find(".skprx") != string::npos ||
         plName.find(".vpk") != string::npos) {
+            if(sharedData.taiConfig.find("\n"+plName) == string::npos)
             installFiles.push_back(plName);
         }
 
@@ -89,12 +140,11 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
     if(state == 1) {
         if(installFiles[currentPlugin].find(".txt") != string::npos ||
         installFiles[currentPlugin].find(".cfg") != string::npos) {
-            fs.copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
+            Filesystem::copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
             currentPlugin++;
         }
-        else if(installFiles[currentPlugin].find(".skprx") != string::npos &&
-        sharedData.taiConfig.find(installFiles[currentPlugin]) == string::npos) {
-            fs.copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
+        else if(installFiles[currentPlugin].find(".skprx") != string::npos) {
+            Filesystem::copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
             sharedData.taiConfig += "\n\n*Kernel\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
             currentPlugin++;
         }
@@ -102,22 +152,21 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
             // TODO
             currentPlugin++;
         }
-        else if(installFiles[currentPlugin].find(".suprx") != string::npos &&
-        sharedData.taiConfig.find(installFiles[currentPlugin]) == string::npos) {
+        else if(installFiles[currentPlugin].find(".suprx") != string::npos) {
             handleSuprx(sharedData, currentPlugin, button);
         }
         else if(installFiles[currentPlugin].find("data") != string::npos) {
-            fs.copyPath(plPath+"/data", "ux0:data");
+            Filesystem::copyPath(plPath+"/data", "ux0:data");
             currentPlugin++;
         }
 
-        if(currentPlugin == installFiles.size()-1) state = 2;
+        if(currentPlugin == installFiles.size()) state = 2;
     }
 
     if(state == 2) {
-        fs.writeFile(sharedData.taiConfigPath+"config.txt", sharedData.taiConfig);
+        Filesystem::writeFile(sharedData.taiConfigPath+"config.txt", sharedData.taiConfig);
         if(archive) {
-            fs.removePath(plPath);
+            Filesystem::removePath(plPath);
             sceIoRemove((sharedData.taiConfigPath+plName).c_str());
         }
 

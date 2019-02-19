@@ -16,32 +16,42 @@
 
 SceCtrlData pad;
 
-vector<AppInfo> getAppData() {
-    vector<AppInfo> ret;
+AppInfo::AppInfo(string p_appID, string p_title, string fileLocation) {
+    appID = p_appID;
+    title = p_title;
+    icon = vita2d_load_PNG_file(fileLocation.c_str());
+}
 
+string logging = "";
+
+int getAppData(vector<AppInfo> &ret) {
     SceIoDirent dirInfo;
     SceUID folder;
 
-    AppInfo app;
-
-    if( (folder = sceIoDopen( "ur0:appmeta/" )) != NULL) {
+    //*works replace with sql later*
+    if( (folder = sceIoDopen( "ux0:app/" )) != NULL) {
         while (sceIoDread(folder, &dirInfo) != NULL) {
-            app.appID = string(dirInfo.d_name);
-            app.title = "name";
-            app.icon = vita2d_load_PNG_file(("ur0:appmeta/"+app.appID+"/icon0.png").c_str());
 
-            ret.push_back(app);
+            //--> redo this part to be more compact at some point
+            void *sfo_buffer = NULL;
+            int sfo_size = allocateReadFile(string("ux0:app/"+string(dirInfo.d_name)+"/sce_sys/param.sfo").c_str(), &sfo_buffer);
+            if (sfo_size < 0)
+                return sfo_size;
+
+            char name[48];
+            getSfoString(sfo_buffer, "TITLE", name, sizeof(name));
+            //<--
+
+            ret.emplace_back(string(dirInfo.d_name), string(name), ("ur0:appmeta/"+string(dirInfo.d_name)+"/icon0.png").c_str());
         }
     }
 
     sceIoDclose(folder);
 
-    return ret;
+    return 0;
 }
 
 int main() {
-    Filesystem fs;
-
     vita2d_init();
     vita2d_set_clear_color(RGBA8(255,255,255,255));
 
@@ -57,11 +67,11 @@ int main() {
     else if(doesDirExist("ur0:tai")) sharedData.taiConfigPath = "ur0:tai/";
     else return -1;
 
-    sharedData.taiConfig = fs.readFile(sharedData.taiConfigPath+"config.txt");
+    sharedData.taiConfig = Filesystem::readFile(sharedData.taiConfigPath+"config.txt");
 
-    sharedData.plugins = json::parse(fs.readFile("ux0:data/Easy_Plugins/plugins.json"));
+    sharedData.plugins = json::parse(Filesystem::readFile("ux0:data/Easy_Plugins/plugins.json"));
 
-    sharedData.appData = getAppData();
+    getAppData(sharedData.appData);
 
     sharedData.original = sharedData.plugins;
 
@@ -84,8 +94,6 @@ int main() {
 
         if(sharedData.scene == 2) popupView.draw(sharedData, pad.buttons);
 
-        vita2d_font_draw_textf(sharedData.font, 20, 20, RGBA8(255,255,255,255), 32, "%s", sharedData.appData[0].appID.c_str());
-
         vita2d_end_drawing();
         vita2d_swap_buffers();
 
@@ -97,12 +105,11 @@ int main() {
         }
     }
 
-    for(int i=0;i<sharedData.appData.size();i++) vita2d_free_texture(sharedData.appData[i].icon);
-
     httpTerm();
     netTerm();
     vita2d_free_font(sharedData.font);
     vita2d_free_texture(bgIMG);
+    vita2d_free_texture(sharedData.appData[0].icon);
     listView.free();
     detailsView.free();
     vita2d_fini();

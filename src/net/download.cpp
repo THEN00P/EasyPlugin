@@ -92,8 +92,6 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
     SceUID file = sceIoOpen("ux0:data/Easy_Plugins/plugin.tmp", SCE_O_CREAT | SCE_O_WRONLY, 0777);
     SceUID head = sceIoOpen("ux0:data/Easy_Plugins/head.tmp", SCE_O_CREAT | SCE_O_WRONLY, 0777);
 
-    Filesystem fs;
-
     curl = curl_easy_init();
     if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -112,13 +110,13 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
     sceIoClose(file);
     sceIoClose(head);
 
-    std::string header = fs.readFile("ux0:data/Easy_Plugins/head.tmp");
+    std::string header = Filesystem::readFile("ux0:data/Easy_Plugins/head.tmp");
 
     header = header.substr(header.find("filename=\"")+10);
 
     header = header.substr(0, header.find("\""));
 
-    fs.copyFile("ux0:data/Easy_Plugins/plugin.tmp", dst+header);
+    Filesystem::copyFile("ux0:data/Easy_Plugins/plugin.tmp", dst+header);
 
     sceIoRemove("ux0:data/Easy_Plugins/plugin.tmp");
     sceIoRemove("ux0:data/Easy_Plugins/head.tmp");

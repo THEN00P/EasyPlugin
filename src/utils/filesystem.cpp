@@ -4,32 +4,52 @@
 #include <string>
 
 #include "filesystem.hpp"
+                  
+int getSfoString(void *buffer, char *name, char *stringS, int length) {
+	SfoHeader *header = (SfoHeader *)buffer;
+	SfoEntry *entries = (SfoEntry *)((uint32_t)buffer + sizeof(SfoHeader));
 
-std::string getSfoString(const char *path, const char *name) {
-  char *buffer;
+	if (header->magic != SFO_MAGIC)
+    	return -1;
 
-  SceUID fd = sceIoOpen(path, SCE_O_RDONLY, 0777);
+	int i;
+	for (i = 0; i < header->count; i++) {
+		if (strcmp((char *)buffer + header->keyofs + entries[i].nameofs, name) == 0) {
+			memset(stringS, 0, length);
+			strncpy(stringS, (char *)buffer + header->valofs + entries[i].dataofs, length);
+			stringS[length - 1] = '\0';
+			return 0;
+		}
+	}
 
-  int fileSize = sceIoLseek ( fd, 0, SCE_SEEK_END );
-  sceIoLseek (fd, 0, SCE_SEEK_SET ); // reset 'cursor' in file
+	return -2;
+}
 
-  sceIoRead(fd, buffer, fileSize);
+int allocateReadFile(const char *file, void **buffer) {
+	SceUID fd = sceIoOpen(file, SCE_O_RDONLY, 0);
+	if (fd < 0)
+		return fd;
 
-  SfoHeader *header = (SfoHeader *)buffer;
-  SfoEntry *entries = (SfoEntry *)((uint32_t)buffer + sizeof(SfoHeader));
+	int size = sceIoLseek32(fd, 0, SCE_SEEK_END);
+	sceIoLseek32(fd, 0, SCE_SEEK_SET);
 
-  if (header->magic != SFO_MAGIC)
-    return "Sfo magic not found";
+	*buffer = malloc(size);
+	if (!*buffer) {
+		sceIoClose(fd);
+		return -1;
+	}
 
-  int i;
-  for (i = 0; i < header->count; i++) {
-    if (strcmp(buffer + header->keyofs + entries[i].nameofs, name) == 0) {
-      return std::string(buffer + header->valofs + entries[i].dataofs);
-      sceIoClose(fd);
-    }
-  }
+	int read = sceIoRead(fd, *buffer, size);
+	sceIoClose(fd);
 
-  return "Sfo string not found";
+	return read;
+}
+
+bool hasEndSlash(std::string str) {
+    std::string slash = "/";
+
+    if (slash.size() > slash.size()) return false;
+    return std::equal(slash.rbegin(), slash.rend(), str.rbegin());
 }
 
 std::string Filesystem::readFile(std::string file) {
@@ -236,11 +256,4 @@ int Filesystem::removePath(std::string path) {
   }
 
   return 1;
-}
-
-bool Filesystem::hasEndSlash(std::string str) {
-    std::string slash = "/";
-
-    if (slash.size() > slash.size()) return false;
-    return std::equal(slash.rbegin(), slash.rend(), str.rbegin());
 }

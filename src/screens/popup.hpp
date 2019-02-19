@@ -22,5 +22,4 @@ class Popup {
         string plPath;
         string plName = "";
         vector<string> installFiles;
-        Filesystem fs;
 };

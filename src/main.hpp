@@ -13,10 +13,12 @@ using json = nlohmann::json;
 extern unsigned int basicfont_size;
 extern unsigned char basicfont[];
 
-struct AppInfo {
-    string appID;
-    string title;
-    vita2d_texture *icon;
+class AppInfo {
+    public:
+        AppInfo(string p_appID, string p_title, string fileLocation);
+        string appID;
+        string title;
+        vita2d_texture *icon;
 };
 
 struct SharedData {

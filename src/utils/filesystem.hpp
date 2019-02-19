@@ -28,19 +28,18 @@ typedef struct SfoEntry {
 
 #define SFO_MAGIC 0x46535000
 
-std::string getSfoString(const char *path, const char *name);
+int getSfoString(void *buffer, char *name, char *stringS, int length);
+
+int allocateReadFile(const char *file, void **buffer);
 
 class Filesystem {
     public:
-        std::string readFile(std::string file);
-        static int log(std::string log);
-        int writeFile(std::string file, std::string buf);
-        int copyFile(std::string src, std::string dst);
-        int copyPath(std::string src, std::string dst);
-        int removePath(std::string path);
-        bool fileExists(std::string path);
-    private:
-        bool hasEndSlash(std::string str);
+        static std::string readFile(std::string file);
+        static int writeFile(std::string file, std::string buf);
+        static int copyFile(std::string src, std::string dst);
+        static int copyPath(std::string src, std::string dst);
+        static int removePath(std::string path);
+        static bool fileExists(std::string path);
 };
 
 int copyFile(const char *src_path, const char *dst_path);
