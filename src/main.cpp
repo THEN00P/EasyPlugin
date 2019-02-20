@@ -2,9 +2,11 @@
 #include <psp2/kernel/processmgr.h>
 #include <psp2/power.h> 
 #include <psp2/io/fcntl.h>
+#include <psp2/sqlite.h>
 #include <string>
 
 #include "main.hpp"
+#include "sqlite3.h"
 #include "net/download.hpp"
 #include "utils/filesystem.hpp"
 #include "utils/search.hpp"
@@ -19,34 +21,38 @@ SceCtrlData pad;
 AppInfo::AppInfo(string p_appID, string p_title, string fileLocation) {
     appID = p_appID;
     title = p_title;
-    icon = vita2d_load_PNG_file(fileLocation.c_str());
+    icon = fileLocation.find(".dds") == string::npos ? vita2d_load_PNG_file(fileLocation.c_str()) : NULL;
 }
 
-string logging = "";
+static int callback(void *data, int argc, char **argv, char **column_name) {
+    vector<AppInfo> *ret = (vector<AppInfo>*) data;
+
+	ret->emplace_back(string(argv[0]), string(argv[1]), string(argv[2]));
+	return 0;
+}
 
 int getAppData(vector<AppInfo> &ret) {
     SceIoDirent dirInfo;
     SceUID folder;
 
-    //*works replace with sql later*
-    if( (folder = sceIoDopen( "ux0:app/" )) != NULL) {
-        while (sceIoDread(folder, &dirInfo) != NULL) {
+    sqlite3 *db = NULL;
 
-            //--> redo this part to be more compact at some point
-            void *sfo_buffer = NULL;
-            int sfo_size = allocateReadFile(string("ux0:app/"+string(dirInfo.d_name)+"/sce_sys/param.sfo").c_str(), &sfo_buffer);
-            if (sfo_size < 0)
-                return sfo_size;
+    sceSysmoduleLoadModule(SCE_SYSMODULE_SQLITE);
 
-            char name[48];
-            getSfoString(sfo_buffer, "TITLE", name, sizeof(name));
-            //<--
+    sqlite3_rw_init();
 
-            ret.emplace_back(string(dirInfo.d_name), string(name), ("ur0:appmeta/"+string(dirInfo.d_name)+"/icon0.png").c_str());
-        }
+    int rc = sqlite3_open_v2("ur0:shell/db/app.db", &db, SQLITE_OPEN_READONLY, NULL);
+    if(rc != SQLITE_OK) {
+        return -1;
     }
 
-    sceIoDclose(folder);
+    sqlite3_exec(db, "SELECT titleId, title, iconPath FROM tbl_appinfo_icon WHERE NOT titleId=\"NULL\" ORDER BY title ASC", callback, &ret, NULL);
+
+	if (db != NULL)
+		sqlite3_close(db);
+	sqlite3_rw_exit();
+
+    sceSysmoduleUnloadModule(SCE_SYSMODULE_SQLITE);
 
     return 0;
 }
@@ -109,7 +115,10 @@ int main() {
     netTerm();
     vita2d_free_font(sharedData.font);
     vita2d_free_texture(bgIMG);
-    vita2d_free_texture(sharedData.appData[0].icon);
+    for(int i=0; i<sharedData.appData.size();i++) {
+        if(sharedData.appData[i].icon != NULL)
+        vita2d_free_texture(sharedData.appData[i].icon);
+    }
     listView.free();
     detailsView.free();
     vita2d_fini();

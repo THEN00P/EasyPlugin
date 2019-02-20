@@ -3,6 +3,7 @@
 #include <vita2d.h>
 #include <psp2/ctrl.h>
 #include <psp2/kernel/clib.h>
+#include <psp2/sysmodule.h>
 
 #include "utils/json.hpp"
 

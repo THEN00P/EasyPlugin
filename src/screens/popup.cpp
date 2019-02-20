@@ -15,20 +15,12 @@ string toUppercase(string strToConvert) {
 }
 
 int selected = 0;
-int alpha = 200;
-int velocity = 5;
 int scrollY = 0;
 int scrollDelay = 0;
 int scrollStage = 0;
 
 void handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button) {
     vita2d_draw_rectangle(0, 0, 960, 544, RGBA8(234,234,234,255));
-
-    //TODO
-    if(alpha > 230) velocity -= 0.1;
-    if(alpha < 20) velocity += 0.1;
-
-    alpha += velocity;
 
     if(scrollDelay >= 0) scrollDelay--;
     if(button == NULL) {
@@ -39,7 +31,7 @@ void handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button
     if(selected*168 > scrollY+374) scrollY += 168;
     if(selected*168 < scrollY) scrollY -= 168;
 
-    vita2d_draw_rectangle(0, (selected*168)+20-scrollY, 960, 128, RGBA8(70,211,207,alpha));
+    vita2d_draw_rectangle(0, (selected*168)+10-scrollY, 960, 148, RGBA8(0,0,0,60));
 
     for(int i=0;i<sharedData.appData.size();i++) {
 
@@ -50,7 +42,7 @@ void handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button
         vita2d_draw_texture(sharedData.appData[i].icon, 40, (i*168)+20-scrollY);
         else vita2d_draw_rectangle(40, (i*168)+20-scrollY, 128, 128, RGBA8(255,255,255,255));
         
-        vita2d_font_draw_textf(sharedData.font, 170, (i*168)+80-scrollY, RGBA8(16,16,16,255), 32, "%s", sharedData.appData[i].title.c_str());
+        vita2d_font_draw_textf(sharedData.font, 190, (i*168)+90-scrollY, RGBA8(16,16,16,255), 45, "%s", sharedData.appData[i].title.c_str());
     }
 
     if(scrollDelay <= 1) {
