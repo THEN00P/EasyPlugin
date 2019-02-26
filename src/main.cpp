@@ -3,6 +3,9 @@
 #include <psp2/power.h> 
 #include <psp2/io/fcntl.h>
 #include <psp2/sqlite.h>
+#include <psp2/apputil.h>
+#include <psp2/display.h>
+#include <psp2/ime_dialog.h>
 #include <string>
 
 #include "main.hpp"
@@ -31,9 +34,29 @@ static int callback(void *data, int argc, char **argv, char **column_name) {
 	return 0;
 }
 
+void initSceAppUtil()
+{
+	// Init SceAppUtil
+	SceAppUtilInitParam init_param;
+	SceAppUtilBootParam boot_param;
+	memset(&init_param, 0, sizeof(SceAppUtilInitParam));
+	memset(&boot_param, 0, sizeof(SceAppUtilBootParam));
+	sceAppUtilInit(&init_param, &boot_param);
+
+	// Set common dialog config
+	SceCommonDialogConfigParam config;
+	sceCommonDialogConfigParamInit(&config);
+	sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_LANG, (int *)&config.language);
+	sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_ENTER_BUTTON, (int *)&config.enterButtonAssign);
+	sceCommonDialogSetConfigParam(&config);
+}
+
 int getAppData(vector<AppInfo> &ret) {
     SceIoDirent dirInfo;
     SceUID folder;
+
+	ret.emplace_back("ALL", "All", "");
+	ret.emplace_back("main", "Livearea (main)", "");
 
     sqlite3 *db = NULL;
 
@@ -59,6 +82,8 @@ int getAppData(vector<AppInfo> &ret) {
 
 int main() {
     vita2d_init();
+    initSceAppUtil();
+
     vita2d_set_clear_color(RGBA8(255,255,255,255));
 
     vita2d_texture *bgIMG = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/bg.png");
@@ -101,7 +126,9 @@ int main() {
         if(sharedData.scene == 2) popupView.draw(sharedData, pad.buttons);
 
         vita2d_end_drawing();
+        vita2d_common_dialog_update();
         vita2d_swap_buffers();
+        sceDisplayWaitVblankStart();
 
         if(pad.buttons == SCE_CTRL_SELECT) {
             break;
@@ -121,6 +148,7 @@ int main() {
     }
     listView.free();
     detailsView.free();
+    popupView.free();
     vita2d_fini();
     
     sceKernelExitProcess(0);

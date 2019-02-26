@@ -13,6 +13,12 @@ class Popup {
         void free();
 
     private:
+        void handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button);
+        int selected = 0;
+        int scrollY = 0;
+        int scrollDelay = 0;
+        int scrollStage = 0;
+        vector<int> selectedApps;
         SceIoDirent dirStruct;
         bool tai = true;
         bool archive = false;
@@ -22,4 +28,5 @@ class Popup {
         string plPath;
         string plName = "";
         vector<string> installFiles;
+        vita2d_texture *desc = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc2.png");
 };

@@ -9,29 +9,6 @@
 
 #define TRANSFER_SIZE (128 * 1024)
 
-typedef struct SfoHeader {
-  uint32_t magic;
-  uint32_t version;
-  uint32_t keyofs;
-  uint32_t valofs;
-  uint32_t count;
-} __attribute__((packed)) SfoHeader;
-
-typedef struct SfoEntry {
-  uint16_t nameofs;
-  uint8_t  alignment;
-  uint8_t  type;
-  uint32_t valsize;
-  uint32_t totalsize;
-  uint32_t dataofs;
-} __attribute__((packed)) SfoEntry;
-
-#define SFO_MAGIC 0x46535000
-
-int getSfoString(void *buffer, char *name, char *stringS, int length);
-
-int allocateReadFile(const char *file, void **buffer);
-
 class Filesystem {
     public:
         static std::string readFile(std::string file);

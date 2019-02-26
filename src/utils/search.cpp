@@ -2,19 +2,13 @@
 #include <psp2/ime_dialog.h>
 #include <string>
 
+#include "search.hpp"
 #include "json.hpp"
 
 using json = nlohmann::json;
 using namespace std;
 
-#define SCE_IME_DIALOG_MAX_TITLE_LENGTH	(128)
-#define SCE_IME_DIALOG_MAX_TEXT_LENGTH	(512)
-
-#define IME_DIALOG_RESULT_NONE 0
-#define IME_DIALOG_RESULT_RUNNING 1
-#define IME_DIALOG_RESULT_FINISHED 2
-#define IME_DIALOG_RESULT_CANCELED 3
-
+static int ime_dialog_running = 0;
 
 static uint16_t ime_title_utf16[SCE_IME_DIALOG_MAX_TITLE_LENGTH];
 static uint16_t ime_initial_text_utf16[SCE_IME_DIALOG_MAX_TEXT_LENGTH];
@@ -63,24 +57,17 @@ void utf8_to_utf16(uint8_t *src, uint16_t *dst) {
 	*dst = '\0';
 }
 
-void oslOskGetText(char *text){
-	// Convert UTF16 to UTF8
-	utf16_to_utf8(ime_input_text_utf16, ime_input_text_utf8);
-	strcpy(text,(char*)ime_input_text_utf8);
-}
- 
-string initImeDialog(char *title, char *initial_text, int max_text_length) {
-	bool done = false;
-	char userText[512];
+int initImeDialog(char *title, char *initial_text, int max_text_length) {
+	if (ime_dialog_running)
+		return -1;
 
-    // Convert UTF8 to UTF16
+	// Convert UTF8 to UTF16
 	utf8_to_utf16((uint8_t *)title, ime_title_utf16);
 	utf8_to_utf16((uint8_t *)initial_text, ime_initial_text_utf16);
- 
-    SceImeDialogParam param;
+
+	SceImeDialogParam param;
 	sceImeDialogParamInit(&param);
 
-	param.sdkVersion = 0x03150021,
 	param.supportedLanguages = 0x0001FFFF;
 	param.languagesForced = SCE_TRUE;
 	param.type = SCE_IME_TYPE_BASIC_LATIN;
@@ -89,29 +76,48 @@ string initImeDialog(char *title, char *initial_text, int max_text_length) {
 	param.initialText = ime_initial_text_utf16;
 	param.inputTextBuffer = ime_input_text_utf16;
 
-	//int res = 
-	sceImeDialogInit(&param);
-	
-	while(!done) {
-		SceCommonDialogStatus status = sceImeDialogGetStatus();
-       
-		if (status == IME_DIALOG_RESULT_FINISHED) {
-			SceImeDialogResult result;
-			memset(&result, 0, sizeof(SceImeDialogResult));
-			sceImeDialogGetResult(&result);
+	int res = sceImeDialogInit(&param);
+	if (res >= 0)
+		ime_dialog_running = 1;
 
-			if (result.button == SCE_IME_DIALOG_BUTTON_CLOSE || status == IME_DIALOG_RESULT_CANCELED) {
-				sceImeDialogTerm();
-				return "❌";
-			} else {
-				oslOskGetText(userText);
-			}
-			
-			done = true;
-			sceImeDialogTerm();
+	return res;
+}
+
+int isImeDialogRunning() {
+	return ime_dialog_running;	
+}
+
+uint16_t *getImeDialogInputTextUTF16() {
+	return ime_input_text_utf16;
+}
+
+uint8_t *getImeDialogInputTextUTF8() {
+	return ime_input_text_utf8;
+}
+
+int updateImeDialog() {
+	if (!ime_dialog_running)
+		return IME_DIALOG_RESULT_NONE;
+
+	int status = sceImeDialogGetStatus();
+	if (status == IME_DIALOG_RESULT_FINISHED) {
+		SceImeDialogResult result;
+		memset(&result, 0, sizeof(SceImeDialogResult));
+		sceImeDialogGetResult(&result);
+
+		if (result.button == SCE_IME_DIALOG_BUTTON_CLOSE) {
+			status = IME_DIALOG_RESULT_CANCELED;
+		} else {
+			// Convert UTF16 to UTF8
+			utf16_to_utf8(ime_input_text_utf16, ime_input_text_utf8);
 		}
+
+		sceImeDialogTerm();
+
+		ime_dialog_running = 0;
 	}
-	return userText;
+
+	return status;
 }
 
 json sortJson(string filter, json original) {

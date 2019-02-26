@@ -4,46 +4,6 @@
 #include <string>
 
 #include "filesystem.hpp"
-                  
-int getSfoString(void *buffer, char *name, char *stringS, int length) {
-	SfoHeader *header = (SfoHeader *)buffer;
-	SfoEntry *entries = (SfoEntry *)((uint32_t)buffer + sizeof(SfoHeader));
-
-	if (header->magic != SFO_MAGIC)
-    	return -1;
-
-	int i;
-	for (i = 0; i < header->count; i++) {
-		if (strcmp((char *)buffer + header->keyofs + entries[i].nameofs, name) == 0) {
-			memset(stringS, 0, length);
-			strncpy(stringS, (char *)buffer + header->valofs + entries[i].dataofs, length);
-			stringS[length - 1] = '\0';
-			return 0;
-		}
-	}
-
-	return -2;
-}
-
-int allocateReadFile(const char *file, void **buffer) {
-	SceUID fd = sceIoOpen(file, SCE_O_RDONLY, 0);
-	if (fd < 0)
-		return fd;
-
-	int size = sceIoLseek32(fd, 0, SCE_SEEK_END);
-	sceIoLseek32(fd, 0, SCE_SEEK_SET);
-
-	*buffer = malloc(size);
-	if (!*buffer) {
-		sceIoClose(fd);
-		return -1;
-	}
-
-	int read = sceIoRead(fd, *buffer, size);
-	sceIoClose(fd);
-
-	return read;
-}
 
 bool hasEndSlash(std::string str) {
     std::string slash = "/";

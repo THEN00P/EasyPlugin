@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <psp2/io/dirent.h>
 #include <psp2/io/stat.h>
 
@@ -6,7 +8,7 @@
 #include "../net/download.hpp"
 #include "popup.hpp"
 
-#define columnHeight = 168;
+#define columnHeight 168
 
 string toUppercase(string strToConvert) {
     std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
@@ -14,42 +16,54 @@ string toUppercase(string strToConvert) {
     return strToConvert;
 }
 
-int selected = 0;
-int scrollY = 0;
-int scrollDelay = 0;
-int scrollStage = 0;
-
-void handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button) {
-    vita2d_draw_rectangle(0, 0, 960, 544, RGBA8(234,234,234,255));
-
+void Popup::handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button) {
     if(scrollDelay >= 0) scrollDelay--;
     if(button == NULL) {
         scrollDelay = 0; 
         scrollStage = 0;
     }
     
-    if(selected*168 > scrollY+374) scrollY += 168;
-    if(selected*168 < scrollY) scrollY -= 168;
+    if(selected*columnHeight > scrollY+374) scrollY += columnHeight;
+    if(selected*columnHeight < scrollY) scrollY -= columnHeight;
 
-    vita2d_draw_rectangle(0, (selected*168)+10-scrollY, 960, 148, RGBA8(0,0,0,60));
+    vita2d_draw_rectangle(0, (selected*columnHeight)-scrollY, 960, columnHeight, RGBA8(0,0,0,60));
 
     for(int i=0;i<sharedData.appData.size();i++) {
 
-        if((i*168)-scrollY>544) break;
-        if((i*168)+178-scrollY<0) continue;
+        if((i*columnHeight)-scrollY>544) break;
+        if((i*columnHeight)+178-scrollY<0) continue;
 
         if(sharedData.appData[i].icon != NULL)
-        vita2d_draw_texture(sharedData.appData[i].icon, 40, (i*168)+20-scrollY);
-        else vita2d_draw_rectangle(40, (i*168)+20-scrollY, 128, 128, RGBA8(255,255,255,255));
+        vita2d_draw_texture(sharedData.appData[i].icon, 40, (i*columnHeight)+20-scrollY);
+        else vita2d_draw_rectangle(40, (i*columnHeight)+20-scrollY, 128, 128, RGBA8(255,255,255,255));
         
-        vita2d_font_draw_textf(sharedData.font, 190, (i*168)+90-scrollY, RGBA8(16,16,16,255), 45, "%s", sharedData.appData[i].title.c_str());
+        vita2d_font_draw_textf(sharedData.font, 190, (i*columnHeight)+90-scrollY, RGBA8(255,255,255,255), 45, "%s", sharedData.appData[i].title.c_str());
+
+        vita2d_draw_rectangle(870, (i*columnHeight)+55-scrollY, 42, 42, RGBA8(255,255,255,255));
+
+        if(find(selectedApps.begin(), selectedApps.end(), i) != selectedApps.end()) {
+            vita2d_draw_rectangle(875, (i*columnHeight)+60-scrollY, 32, 32, RGBA8(38,166,242,255));
+        }
     }
+
+    vita2d_draw_texture(desc, 0, 504);
 
     if(scrollDelay <= 1) {
         if(scrollDelay == 0) scrollStage = 0;
         switch(button) {
             case SCE_CTRL_CROSS:
-                if(!sharedData.blockCross) currentPlugin++;
+                if(!sharedData.blockCross) {
+                    sharedData.blockCross = true;
+
+                    auto found = find(selectedApps.begin(), selectedApps.end(), selected);
+                    if(found != selectedApps.end()) {
+                        auto index = distance(selectedApps.begin(), found);
+                        selectedApps.erase(selectedApps.begin()+index);
+                    }
+                    else {
+                        selectedApps.push_back(selected);
+                    }
+                }
                 break;
             case SCE_CTRL_DOWN:
                 if(selected >= sharedData.appData.size()-1) break;
@@ -164,4 +178,8 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
 
         sharedData.scene = 0;
     }
+}
+
+void Popup::free() {
+    vita2d_free_texture(desc);
 }

@@ -4,6 +4,13 @@
 #include "list.hpp"
 
 void List::draw(SharedData &sharedData, unsigned int button) {
+    if(updateImeDialog() == IME_DIALOG_RESULT_FINISHED) {
+        searchResult = string((char *)getImeDialogInputTextUTF8());
+
+        if(searchResult == "" || searchResult == "*") sharedData.plugins = sharedData.original;
+        else sharedData.plugins = sortJson(searchResult, sharedData.original);
+    }
+
     arrayLength = static_cast<int>(sharedData.plugins.size());     
     scrollPercent = 504.0 / (arrayLength*85);   
     scrollThumbHeight = 504*scrollPercent;
@@ -48,10 +55,7 @@ void List::draw(SharedData &sharedData, unsigned int button) {
                 sharedData.scene = 1;
                 break;
             case SCE_CTRL_TRIANGLE:
-                searchResult = initImeDialog("Search", "Enter a query", 28);
-
-                if(searchResult == "" || searchResult == "*") sharedData.plugins = sharedData.original;
-                else if(searchResult != "❌") sharedData.plugins = sortJson(searchResult, sharedData.original);
+                initImeDialog("Search for a plugin", "", 28);
 
                 sharedData.cursorY = 0;
                 break;
