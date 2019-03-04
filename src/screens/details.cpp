@@ -4,11 +4,20 @@
 #include "details.hpp"
 
 void Details::draw(SharedData &sharedData, unsigned int button) {
+    cycleCounter++;
+    if(cycleCounter == 300) {
+        cycleCounter = 0;
+        if(imageCycles < sharedData.screenshots.size()-1) imageCycles++;
+        else imageCycles = 0;
+    }
+
     if(sharedData.initDetail) {
         longDescription = formatLongDesc(sharedData.plugins[sharedData.cursorY]["long_description"].get<string>());
 
         sharedData.initDetail = false;
     }
+
+    if(!sharedData.screenshots.empty()) vita2d_draw_texture_scale(sharedData.screenshots[imageCycles], 350, 10, 0.55, 0.55);
 
     vita2d_font_draw_textf(sharedData.font, 20, 45, RGBA8(255,255,255,255), 35, "%s", (sharedData.plugins[sharedData.cursorY]["name"].get<string>() + " " + sharedData.plugins[sharedData.cursorY]["version"].get<string>()).c_str());
     
@@ -20,6 +29,7 @@ void Details::draw(SharedData &sharedData, unsigned int button) {
         switch(button) {
             case SCE_CTRL_CIRCLE:
                 sharedData.scene = 0;
+
                 break;
             case SCE_CTRL_CROSS:
                 if(sharedData.blockCross) break;

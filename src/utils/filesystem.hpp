@@ -15,8 +15,11 @@ class Filesystem {
         static int writeFile(std::string file, std::string buf);
         static int copyFile(std::string src, std::string dst);
         static int copyPath(std::string src, std::string dst);
+        static int mkDir(std::string path);
         static int removePath(std::string path);
         static bool fileExists(std::string path);
 };
+
+int doesDirExist(const char* path);
 
 int copyFile(const char *src_path, const char *dst_path);

@@ -7,6 +7,8 @@
 
 #include "utils/json.hpp"
 
+#define imageWebBase "http://rinnegatamante.it/vitadb/"
+
 using namespace std;
 
 using json = nlohmann::json;
@@ -29,6 +31,7 @@ struct SharedData {
     bool initDetail = true;
     string taiConfig = "";
     string taiConfigPath = "";
+    vector<vita2d_texture *> screenshots;
     json plugins;
     json original;
     vector<AppInfo> appData;

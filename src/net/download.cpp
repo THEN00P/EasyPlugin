@@ -113,9 +113,9 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
 
     header = header.substr(header.find("filename=\"")+10);
 
-    header = header.substr(0, header.find("\""));
+    std::string filename = header.substr(0, header.find("\""));
 
-    Filesystem::copyFile("ux0:data/Easy_Plugins/plugin.tmp", dst+header);
+    Filesystem::copyFile("ux0:data/Easy_Plugins/plugin.tmp", dst+filename);
 
     sceIoRemove("ux0:data/Easy_Plugins/plugin.tmp");
     sceIoRemove("ux0:data/Easy_Plugins/head.tmp");
@@ -123,5 +123,7 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
     curl_easy_cleanup(curl);
 	curl_global_cleanup();
 
-    return header;
+	Filesystem::writeFile("ux0:data/Easy_Plugins/head.txt", filename);
+
+    return filename;
 }

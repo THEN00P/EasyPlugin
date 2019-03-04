@@ -33,13 +33,3 @@ string formatLongDesc(string str) {
     }
     return sentance;
 }
-
-int doesDirExist(const char* path) { 
-	SceUID dir = sceIoDopen(path); 
- 	if (dir >= 0) { 
- 		sceIoDclose(dir); 
- 		return 1; 
- 	} else { 
- 		return 0; 
- 	} 
-} 

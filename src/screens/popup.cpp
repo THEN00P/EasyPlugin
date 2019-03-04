@@ -11,7 +11,7 @@
 #define columnHeight 168
 
 string toUppercase(string strToConvert) {
-    std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
+    transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
 
     return strToConvert;
 }
@@ -47,10 +47,26 @@ void Popup::handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int
     }
 
     vita2d_draw_texture(desc, 0, 504);
+    vita2d_font_draw_textf(sharedData.font, 20, 524, RGBA8(255,255,255,255), 30, "%s", installFiles[currentPlugin].c_str());
 
     if(scrollDelay <= 1) {
         if(scrollDelay == 0) scrollStage = 0;
         switch(button) {
+            case SCE_CTRL_START:
+                for(int index : selectedApps) {
+                    if(sharedData.taiConfig.find("\n\n*"+sharedData.appData[index].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin]) != string::npos)
+                    sharedData.taiConfig += "\n\n*"+sharedData.appData[index].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
+                }
+                
+                selected = 0;
+                selectedApps.clear();
+                currentPlugin++;
+                break;
+            case SCE_CTRL_CIRCLE:
+                selected = 0;
+                selectedApps.clear();
+                currentPlugin++;
+                break;
             case SCE_CTRL_CROSS:
                 if(!sharedData.blockCross) {
                     sharedData.blockCross = true;
@@ -156,6 +172,11 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
         }
         else if(installFiles[currentPlugin].find(".vpk") != string::npos) {
             // TODO
+
+            // TEMPORARY SOLUTION:
+            Filesystem::mkDir(sharedData.taiConfigPath+"VPKS/");
+            Filesystem::copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+"VPKS/"+installFiles[currentPlugin]);
+
             currentPlugin++;
         }
         else if(installFiles[currentPlugin].find(".suprx") != string::npos) {

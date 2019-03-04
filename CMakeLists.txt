@@ -12,6 +12,9 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     endif()
 endif()
 
+set(ENV{PKG_CONFIG_PATH} "$ENV{VITASDK}/arm-vita-eabi/lib/pkgconfig")
+include(FindPkgConfig)
+
 project(easyplugin)
 
 include("${VITASDK}/share/vita.cmake" REQUIRED)
@@ -33,8 +36,27 @@ link_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+FUNCTION(ADD_RESOURCES out_var)
+  SET(result)
+  FOREACH(in_f ${ARGN})
+    SET(out_f "${CMAKE_CURRENT_BINARY_DIR}/${in_f}.o")
+    GET_FILENAME_COMPONENT(out_dir ${out_f} DIRECTORY)
+    ADD_CUSTOM_COMMAND(OUTPUT ${out_f}
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${out_dir}
+      COMMAND ${CMAKE_LINKER} -r -b binary -o ${out_f} ${in_f}
+      DEPENDS ${in_f}
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      COMMENT "Building resource ${out_f}"
+      VERBATIM
+      )
+    LIST(APPEND result ${out_f})
+  ENDFOREACH()
+  SET(${out_var} "${result}" PARENT_SCOPE)
+ENDFUNCTION()
+
 file(GLOB vhbb
     "src/utils/vhbb/*.cpp"
+    "src/utils/vhbb/*.c"
     "src/utils/vhbb/*.h"
 )
 
@@ -48,10 +70,15 @@ file(GLOB screens
     "src/screens/*.hpp"
 )
 
+file(GLOB_RECURSE res_files RELATIVE ${CMAKE_SOURCE_DIR} src/utils/vhbb/head.bin)
+
+add_resources(ASSETS ${res_files})
+
 add_executable(easyplugin
     ${minizip}
     ${vhbb}
     ${screens}
+    src/
     src/main.cpp
     src/net/download.cpp
     src/utils/filesystem.cpp
@@ -68,6 +95,7 @@ target_link_libraries(easyplugin
     freetype
     png
     z
+    m
     c
     SceGxm_stub
     SceSqlite_stub 
@@ -88,7 +116,6 @@ target_link_libraries(easyplugin
     SceCommonDialog_stub
     SceLibKernel_stub
 )
-
 
 vita_create_self(easyplugin.self easyplugin UNSAFE)
 

@@ -1,7 +1,23 @@
+#include <sstream>
+#include <iostream>
+
 #include "../main.hpp"
 #include "../utils/search.hpp"
+#include "../utils/filesystem.hpp"
+#include "../net/download.hpp"
 
 #include "list.hpp"
+
+std::vector<std::string> split(std::string strToSplit, char delimeter) {
+    std::stringstream ss(strToSplit);
+    std::string item;
+    std::vector<std::string> splittedStrings;
+    while (std::getline(ss, item, delimeter))
+    {
+    splittedStrings.push_back(item);
+    }
+    return splittedStrings;
+}
 
 void List::draw(SharedData &sharedData, unsigned int button) {
     if(updateImeDialog() == IME_DIALOG_RESULT_FINISHED) {
@@ -51,6 +67,31 @@ void List::draw(SharedData &sharedData, unsigned int button) {
                 if(sharedData.blockCross) break;
                 sharedData.initDetail = true;
                 sharedData.blockCross = true;
+                sharedData.screenshots.clear();
+
+                if(sharedData.plugins[sharedData.cursorY]["screenshots"].get<string>() != "") {
+                    if(!sharedData.screenshots.empty()) {
+                        for(int i=0;i<sharedData.screenshots.size();i++) {
+                            if(sharedData.screenshots[i] != NULL)
+                            vita2d_free_texture(sharedData.screenshots[i]);
+                        }
+
+                        sharedData.screenshots.clear();
+                    }
+
+                    subPaths = split(sharedData.plugins[sharedData.cursorY]["screenshots"].get<string>().c_str(), ';');
+
+                    for(string subPath : subPaths) {
+                        Filesystem::mkDir("ux0:data/Easy_Plugins/screenshots");
+                        curlDownload((imageWebBase+subPath).c_str(), ("ux0:data/Easy_Plugins/"+subPath).c_str());
+
+                        sharedData.screenshots.push_back(
+                            vita2d_load_PNG_file((
+                                "ux0:data/Easy_Plugins/"+subPath).c_str()
+                            )
+                        );
+                    }
+                }
 
                 sharedData.scene = 1;
                 break;

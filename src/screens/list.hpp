@@ -16,6 +16,7 @@ class List {
         int arrayLength;
         int scrollDelay = 0;
         int scrollStage = 0;
+        vector<string> subPaths;
         string searchResult = "";
         vita2d_texture *desc = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc.png");
 };

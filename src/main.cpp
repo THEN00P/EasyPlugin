@@ -84,6 +84,8 @@ int main() {
     vita2d_init();
     initSceAppUtil();
 
+    Filesystem::mkDir("ux0:data/Easy_Plugins");
+
     vita2d_set_clear_color(RGBA8(255,255,255,255));
 
     vita2d_texture *bgIMG = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/bg.png");
@@ -134,7 +136,7 @@ int main() {
             break;
         }
         if(pad.buttons == SCE_CTRL_START) {
-            scePowerRequestColdReset();
+            if(sharedData.scene != 2) scePowerRequestColdReset();
         }
     }
 
@@ -145,6 +147,10 @@ int main() {
     for(int i=0; i<sharedData.appData.size();i++) {
         if(sharedData.appData[i].icon != NULL)
         vita2d_free_texture(sharedData.appData[i].icon);
+    }
+    for(int i=0;i<sharedData.screenshots.size();i++) {
+        if(sharedData.screenshots[i] != NULL)
+        vita2d_free_texture(sharedData.screenshots[i]);
     }
     listView.free();
     detailsView.free();

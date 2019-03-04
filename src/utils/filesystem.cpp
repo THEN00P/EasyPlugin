@@ -12,6 +12,23 @@ bool hasEndSlash(std::string str) {
     return std::equal(slash.rbegin(), slash.rend(), str.rbegin());
 }
 
+int doesDirExist(const char* path) { 
+	SceUID dir = sceIoDopen(path); 
+ 	if (dir >= 0) { 
+ 		sceIoDclose(dir); 
+ 		return 1; 
+ 	} else { 
+ 		return 0; 
+ 	} 
+} 
+
+int Filesystem::mkDir(std::string path) {
+  if(!doesDirExist(path.c_str())) {
+    sceIoMkdir(path.c_str(), 0777);
+  }
+  return 0;
+}
+
 std::string Filesystem::readFile(std::string file) {
   int fd = sceIoOpen(file.c_str(), SCE_O_RDONLY, 0777);
 
