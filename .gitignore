@@ -48,6 +48,9 @@ Makefile
 CMakeCache.txt
 *.cmake
 
+#no idea
+config.yml
+
 # vscode
 .vscode/
 

@@ -47,18 +47,19 @@ void Popup::handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int
     }
 
     vita2d_draw_texture(desc, 0, 504);
-    vita2d_font_draw_textf(sharedData.font, 20, 524, RGBA8(255,255,255,255), 30, "%s", installFiles[currentPlugin].c_str());
+    vita2d_font_draw_textf(sharedData.font, 20, 535, RGBA8(255,255,255,255), 30, "%s", installFiles[currentPlugin].c_str());
 
     if(scrollDelay <= 1) {
         if(scrollDelay == 0) scrollStage = 0;
         switch(button) {
             case SCE_CTRL_START:
                 for(int index : selectedApps) {
-                    if(sharedData.taiConfig.find("\n\n*"+sharedData.appData[index].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin]) != string::npos)
+                    if(sharedData.taiConfig.find("\n\n*"+sharedData.appData[index].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin]) == string::npos)
                     sharedData.taiConfig += "\n\n*"+sharedData.appData[index].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
                 }
                 
                 selected = 0;
+                sharedData.blockStart = true;
                 selectedApps.clear();
                 currentPlugin++;
                 break;
@@ -119,12 +120,13 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
 
         if(plName.find(".zip") != string::npos) {
             archive = true;
+
             Zipfile zip = Zipfile(sharedData.taiConfigPath+plName);
             zip.Unzip(sharedData.taiConfigPath+"unzipped/");
 
             plPath += "unzipped/";
 
-            if( (dir = sceIoDopen( (sharedData.taiConfigPath+"unzipped/").c_str() )) != NULL) {
+            if( (dir = sceIoDopen( (plPath).c_str() )) != NULL) {
                 while (sceIoDread(dir, &dirStruct) != NULL) {
                     if(static_cast<string>(dirStruct.d_name).find("game.txt") != string::npos) {
                         installFiles.clear();

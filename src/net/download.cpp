@@ -111,11 +111,21 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
 
     std::string header = Filesystem::readFile("ux0:data/Easy_Plugins/head.tmp");
 
-    header = header.substr(header.find("filename=\"")+10);
+	if(header.find("filename=\"") != string::npos) {
+		header = header.substr(header.find("filename=\"")+10);
 
-    std::string filename = header.substr(0, header.find("\""));
+		header = header.substr(0, header.find("\""));
+	}
+	else if (header.find("location: ") != string::npos) {
+		header = header.substr(header.find("location: ")+10);
+		header = header.substr(0, header.find("\n")-1);
 
-    Filesystem::copyFile("ux0:data/Easy_Plugins/plugin.tmp", dst+filename);
+		while(header.find("/") != string::npos) {
+			header = header.substr(header.find("/")+1);
+		}
+	}
+
+    Filesystem::copyFile("ux0:data/Easy_Plugins/plugin.tmp", dst+header);
 
     sceIoRemove("ux0:data/Easy_Plugins/plugin.tmp");
     sceIoRemove("ux0:data/Easy_Plugins/head.tmp");
@@ -123,7 +133,5 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
     curl_easy_cleanup(curl);
 	curl_global_cleanup();
 
-	Filesystem::writeFile("ux0:data/Easy_Plugins/head.txt", filename);
-
-    return filename;
+    return header;
 }

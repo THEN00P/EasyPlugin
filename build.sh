@@ -1,1 +1,0 @@
-cmd.exe /c taskkill /IM Vita3K.exe || unbuffer cmake CMakeLists.txt && unbuffer make && echo -ne '\007'
