@@ -17,7 +17,11 @@ void Details::draw(SharedData &sharedData, unsigned int button) {
         sharedData.initDetail = false;
     }
 
-    if(!sharedData.screenshots.empty()) vita2d_draw_texture_scale(sharedData.screenshots[imageCycles], 410, 10, 0.56, 0.56);
+    if(!sharedData.screenshots.empty()) {
+        if (sharedData.screenshots[imageCycles] != NULL) {
+            vita2d_draw_texture_scale(sharedData.screenshots[imageCycles], 410, 10, 0.56, 0.56);
+        }
+    }
 
     vita2d_font_draw_textf(sharedData.font, 20, 45, RGBA8(255,255,255,255), 35, "%s", (sharedData.plugins[sharedData.cursorY]["name"].get<string>() + " " + sharedData.plugins[sharedData.cursorY]["version"].get<string>()).c_str());
     
