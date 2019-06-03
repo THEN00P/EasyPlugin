@@ -85,11 +85,20 @@ void List::draw(SharedData &sharedData, unsigned int button) {
                         Filesystem::mkDir("ux0:data/Easy_Plugins/screenshots");
                         curlDownload((imageWebBase+subPath).c_str(), ("ux0:data/Easy_Plugins/"+subPath).c_str());
 
-                        sharedData.screenshots.push_back(
-                            vita2d_load_PNG_file((
-                                "ux0:data/Easy_Plugins/"+subPath).c_str()
-                            )
-                        );
+                        vita2d_texture *img;
+                        const char *img_file = ("ux0:data/Easy_Plugins/"+subPath).c_str();
+
+                        img = vita2d_load_PNG_file(img_file);
+                        if (img == NULL) {
+                            img = vita2d_load_JPEG_file(img_file);
+                            if (img == NULL) {
+                                img = vita2d_load_BMP_file(img_file);
+                            }
+                        }
+
+                        if (img) {
+                            sharedData.screenshots.push_back(img);
+                        }
                     }
                 }
 
