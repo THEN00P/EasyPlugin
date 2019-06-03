@@ -68,6 +68,7 @@ target_link_libraries(easyplugin
     ${OPENSSL_LIBRARIES}
     freetype
     png
+    jpeg
     z
     m
     c
