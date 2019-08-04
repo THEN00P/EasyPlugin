@@ -27,7 +27,7 @@ void List::draw(SharedData &sharedData, unsigned int button) {
         else sharedData.plugins = sortJson(searchResult, sharedData.original);
     }
 
-    arrayLength = static_cast<int>(sharedData.plugins.size());     
+    arrayLength = static_cast<int>(sharedData.plugins.size());
     scrollPercent = 504.0 / (arrayLength*85);   
     scrollThumbHeight = 504*scrollPercent;
 
@@ -72,7 +72,7 @@ void List::draw(SharedData &sharedData, unsigned int button) {
                 if(sharedData.plugins[sharedData.cursorY]["screenshots"].get<string>() != "") {
                     if(!sharedData.screenshots.empty()) {
                         for(int i=0;i<sharedData.screenshots.size();i++) {
-                            if(sharedData.screenshots[i] != NULL)
+                            if(sharedData.screenshots[i])
                             vita2d_free_texture(sharedData.screenshots[i]);
                         }
 
@@ -86,13 +86,14 @@ void List::draw(SharedData &sharedData, unsigned int button) {
                         curlDownload((imageWebBase+subPath).c_str(), ("ux0:data/Easy_Plugins/"+subPath).c_str());
 
                         vita2d_texture *img;
-                        const char *img_file = ("ux0:data/Easy_Plugins/"+subPath).c_str();
+                        string img_file = ("ux0:data/Easy_Plugins/"+subPath);
 
-                        img = vita2d_load_PNG_file(img_file);
-                        if (img == NULL) {
-                            img = vita2d_load_JPEG_file(img_file);
-                            if (img == NULL) {
-                                img = vita2d_load_BMP_file(img_file);
+                        img = vita2d_load_PNG_file(img_file.c_str());
+
+                        if (!img) {
+                            img = vita2d_load_JPEG_file(img_file.c_str());
+                            if (!img) {
+                                img = vita2d_load_BMP_file(img_file.c_str());
                             }
                         }
 
@@ -100,6 +101,7 @@ void List::draw(SharedData &sharedData, unsigned int button) {
                             sharedData.screenshots.push_back(img);
                         }
                     }
+                    
                 }
 
                 sharedData.scene = 1;

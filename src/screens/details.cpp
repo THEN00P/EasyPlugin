@@ -3,7 +3,18 @@
 
 #include "details.hpp"
 
+#define maxImageHeight 305
+
 void Details::draw(SharedData &sharedData, unsigned int button) {
+    if(sharedData.initDetail) {
+        cycleCounter = 0;
+        imageCycles = 0;
+        
+        longDescription = formatLongDesc(sharedData.plugins[sharedData.cursorY]["long_description"].get<string>());
+
+        sharedData.initDetail = false;
+    }
+
     cycleCounter++;
     if(cycleCounter == 300) {
         cycleCounter = 0;
@@ -11,15 +22,13 @@ void Details::draw(SharedData &sharedData, unsigned int button) {
         else imageCycles = 0;
     }
 
-    if(sharedData.initDetail) {
-        longDescription = formatLongDesc(sharedData.plugins[sharedData.cursorY]["long_description"].get<string>());
+    if(!sharedData.screenshots.empty()) {        
+        if (sharedData.screenshots[imageCycles]) {
+            unsigned int height = vita2d_texture_get_height(sharedData.screenshots[imageCycles]);
+            
+            float size = (float) maxImageHeight / height;
 
-        sharedData.initDetail = false;
-    }
-
-    if(!sharedData.screenshots.empty()) {
-        if (sharedData.screenshots[imageCycles] != NULL) {
-            vita2d_draw_texture_scale(sharedData.screenshots[imageCycles], 410, 10, 0.56, 0.56);
+            vita2d_draw_texture_scale(sharedData.screenshots[imageCycles], 410, 10, size, size);
         }
     }
 

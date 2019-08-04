@@ -12,7 +12,7 @@
 	<frame id="frame2">
 		<liveitem>
 			<text valign="bottom" align="left" text-align="left" text-valign="bottom" line-space="3" ellipsis="on">
-				<str color="#ffffff" size="50" bold="on" shadow="on">Easy Plugin</str>
+				<str color="#ffffff" size="50" bold="on" shadow="on">EasyPlugin</str>
 			</text>
 		</liveitem>
 	</frame>
@@ -28,7 +28,7 @@
 	<frame id="frame4">
 		<liveitem>
 			<text align="left" text-align="left" word-wrap="off" ellipsis="on">
-				<str size="18" color="#ffffff" shadow="on">v1.00</str>
+				<str size="18" color="#ffffff" shadow="on">v1.1.0</str>
 			</text>
 		</liveitem>
 	</frame>

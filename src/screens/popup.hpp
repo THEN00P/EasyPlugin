@@ -14,6 +14,7 @@ class Popup {
 
     private:
         void handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button);
+        void handleSkprx(SharedData &sharedData, int &currentPlugin, unsigned int button);
         int selected = 0;
         int scrollY = 0;
         int scrollDelay = 0;
@@ -25,8 +26,11 @@ class Popup {
         int currentPlugin = 0;
         int dir;
         int state = 0;
+        int scrollThumbHeight = 0;
+        double scrollPercent = 0;
         string plPath;
         string plName = "";
         vector<string> installFiles;
         vita2d_texture *desc = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc2.png");
+        vita2d_texture *desc2 = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc3.png");
 };

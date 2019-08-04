@@ -16,6 +16,33 @@ string toUppercase(string strToConvert) {
     return strToConvert;
 }
 
+void Popup::handleSkprx(SharedData &sharedData, int &currentPlugin, unsigned int button) {
+    string pluginEntry = "\n\n*Kernel\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
+    size_t pluginEntryPos = sharedData.taiConfig.find(pluginEntry);
+
+    if(pluginEntryPos != string::npos) {
+        int textWidth = vita2d_font_text_width(sharedData.font, 40, (installFiles[currentPlugin]+" is already installed").c_str());
+
+        vita2d_font_draw_textf(sharedData.font, 480 - (textWidth/2), 272, RGBA8(255,255,255,255), 40, "%s is already installed.", installFiles[currentPlugin].c_str());
+        vita2d_draw_texture(desc2, 0, 504);
+    }
+
+    if(pluginEntryPos == string::npos) {        
+        Filesystem::copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
+        sharedData.taiConfig += pluginEntry;
+        currentPlugin++;
+    }
+    else if(button == SCE_CTRL_CROSS && !sharedData.blockCross) {
+        sharedData.taiConfig.erase(pluginEntryPos, pluginEntry.length());
+        sharedData.blockCross = true;
+        currentPlugin++;
+    }
+
+    if(button == SCE_CTRL_CIRCLE) {
+        currentPlugin++;
+    }
+}
+
 void Popup::handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button) {
     if(scrollDelay >= 0) scrollDelay--;
     if(button == NULL) {
@@ -26,9 +53,12 @@ void Popup::handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int
     if(selected*columnHeight > scrollY+374) scrollY += columnHeight;
     if(selected*columnHeight < scrollY) scrollY -= columnHeight;
 
+    int scrollThumbY = scrollY*scrollPercent;
+
     vita2d_draw_rectangle(0, (selected*columnHeight)-scrollY, 960, columnHeight, RGBA8(0,0,0,60));
 
     for(int i=0;i<sharedData.appData.size();i++) {
+        vita2d_draw_rectangle(950, scrollThumbY, 10, scrollThumbHeight, RGBA8(0,0,0,150));
 
         if((i*columnHeight)-scrollY>544) break;
         if((i*columnHeight)+178-scrollY<0) continue;
@@ -39,10 +69,16 @@ void Popup::handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int
         
         vita2d_font_draw_textf(sharedData.font, 190, (i*columnHeight)+90-scrollY, RGBA8(255,255,255,255), 45, "%s", sharedData.appData[i].title.c_str());
 
-        vita2d_draw_rectangle(870, (i*columnHeight)+55-scrollY, 42, 42, RGBA8(255,255,255,255));
+        if(sharedData.taiConfig.find("\n\n*"+sharedData.appData[i].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin]) == string::npos)
+            vita2d_draw_rectangle(870, (i*columnHeight)+55-scrollY, 42, 42, RGBA8(255,255,255,255));
+        else
+            vita2d_draw_rectangle(870, (i*columnHeight)+55-scrollY, 42, 42, RGBA8(255,125,125,255));
 
         if(find(selectedApps.begin(), selectedApps.end(), i) != selectedApps.end()) {
-            vita2d_draw_rectangle(875, (i*columnHeight)+60-scrollY, 32, 32, RGBA8(38,166,242,255));
+            if(sharedData.taiConfig.find("\n\n*"+sharedData.appData[i].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin]) != string::npos)
+                vita2d_draw_rectangle(875, (i*columnHeight)+60-scrollY, 32, 32, RGBA8(255,10,0,255));
+            else
+                vita2d_draw_rectangle(875, (i*columnHeight)+60-scrollY, 32, 32, RGBA8(38,166,242,255));
         }
     }
 
@@ -54,9 +90,16 @@ void Popup::handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int
         switch(button) {
             case SCE_CTRL_START:
                 for(int index : selectedApps) {
-                    if(sharedData.taiConfig.find("\n\n*"+sharedData.appData[index].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin]) == string::npos)
-                    sharedData.taiConfig += "\n\n*"+sharedData.appData[index].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
+                    string pluginEntry = "\n\n*"+sharedData.appData[index].appID+"\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
+                    size_t pluginEntryStart = sharedData.taiConfig.find(pluginEntry);
+
+                    if(pluginEntryStart == string::npos)
+                        sharedData.taiConfig += pluginEntry;
+                    else 
+                        sharedData.taiConfig.erase(pluginEntryStart, pluginEntry.length());
                 }
+
+                if(sharedData.taiConfig.find(sharedData.taiConfigPath+installFiles[currentPlugin]) != string::npos) sceIoRemove((sharedData.taiConfigPath+installFiles[currentPlugin]).c_str());
                 
                 selected = 0;
                 sharedData.blockStart = true;
@@ -117,6 +160,8 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
         archive = false;
         plPath = sharedData.taiConfigPath;
         currentPlugin = 0;
+        scrollPercent = 504.0 / (sharedData.appData.size()*columnHeight);
+        scrollThumbHeight = 504*scrollPercent;
 
         if(plName.find(".zip") != string::npos) {
             archive = true;
@@ -168,9 +213,7 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
             currentPlugin++;
         }
         else if(installFiles[currentPlugin].find(".skprx") != string::npos) {
-            Filesystem::copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
-            sharedData.taiConfig += "\n\n*Kernel\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
-            currentPlugin++;
+            handleSkprx(sharedData, currentPlugin, button);
         }
         else if(installFiles[currentPlugin].find(".vpk") != string::npos) {
             // TODO
@@ -194,15 +237,18 @@ void Popup::draw(SharedData &sharedData, unsigned int button) {
 
     if(state == 2) {
         Filesystem::writeFile(sharedData.taiConfigPath+"config.txt", sharedData.taiConfig);
+
         if(archive) {
             Filesystem::removePath(plPath);
             sceIoRemove((sharedData.taiConfigPath+plName).c_str());
         }
 
         sharedData.scene = 0;
+        state = 0;
     }
 }
 
 void Popup::free() {
     vita2d_free_texture(desc);
+    vita2d_free_texture(desc2);
 }

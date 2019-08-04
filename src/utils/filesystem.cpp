@@ -56,7 +56,7 @@ bool Filesystem::fileExists(std::string path) {
 }
 
 int Filesystem::writeFile(std::string file, std::string buf) {
-  int fd = sceIoOpen(file.c_str(), SCE_O_WRONLY | SCE_O_CREAT, 0777);
+  int fd = sceIoOpen(file.c_str(), SCE_O_WRONLY | SCE_O_CREAT | SCE_O_TRUNC, 0777);
 
   if (fd < 0)
     return fd;

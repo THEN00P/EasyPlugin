@@ -16,7 +16,7 @@ project(easyplugin)
 
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
-set(VITA_APP_NAME "Easy Plugin")
+set(VITA_APP_NAME "EasyPlugin")
 set(VITA_TITLEID  "ESPL00009")
 set(VITA_VERSION  "01.00")
 
@@ -105,4 +105,5 @@ vita_create_vpk(easyplugin.vpk ${VITA_TITLEID} easyplugin.self
   FILE src/graphics/desc.png resources/desc.png
   FILE src/graphics/desc1.png resources/desc1.png
   FILE src/graphics/desc2.png resources/desc2.png
+  FILE src/graphics/desc3.png resources/desc3.png
 )
