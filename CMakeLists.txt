@@ -106,4 +106,5 @@ vita_create_vpk(easyplugin.vpk ${VITA_TITLEID} easyplugin.self
   FILE src/graphics/desc1.png resources/desc1.png
   FILE src/graphics/desc2.png resources/desc2.png
   FILE src/graphics/desc3.png resources/desc3.png
+  FILE src/graphics/desc4.png resources/desc4.png
 )

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <string>
 
+#include "psp2/kernel/clib.h"
 #include "filesystem.hpp"
 
 bool hasEndSlash(std::string str) {
@@ -189,48 +190,27 @@ int Filesystem::copyPath(std::string src, std::string dst) {
 
 int Filesystem::removePath(std::string path) {
   SceUID dfd = sceIoDopen(path.c_str());
-  if (dfd >= 0) {
-    int res = 0;
+  if(dfd < 0)
+    return dfd;
 
-    do {
-      SceIoDirent dir;
-      memset(&dir, 0, sizeof(SceIoDirent));
-
-      res = sceIoDread(dfd, &dir);
-      if (res > 0) {
-        char *new_path = (char *)malloc(path.length() + strlen(dir.d_name) + 2);
-        snprintf(new_path, MAX_PATH_LENGTH, "%s%s%s", path, hasEndSlash(path) ? "" : "/", dir.d_name);
-
-        if (SCE_S_ISDIR(dir.d_stat.st_mode)) {
-          int ret = removePath(new_path);
-          if (ret <= 0) {
-            free(new_path);
-            sceIoDclose(dfd);
-            return ret;
-          }
-        } else {
-          int ret = sceIoRemove(new_path);
-          if (ret < 0) {
-            free(new_path);
-            sceIoDclose(dfd);
-            return ret;
-          }
-        }
-
-        free(new_path);
-      }
-    } while (res > 0);
-
-    sceIoDclose(dfd);
-
-    int ret = sceIoRmdir(path.c_str());
-    if (ret < 0)
-      return ret;
-  } else {
-    int ret = sceIoRemove(path.c_str());
-    if (ret < 0)
-      return ret;
+  SceIoDirent dir;
+  memset(&dir, 0, sizeof(SceIoDirent));
+  while(sceIoDread(dfd, &dir) > 0) {
+    std::string newString = path + (hasEndSlash(path) ? "" : "/") + dir.d_name;
+    
+    if(SCE_S_ISDIR(dir.d_stat.st_mode)) {
+      Filesystem::removePath(newString);
+    }
+    else {
+      if(int ret = sceIoRemove(newString.c_str()) < 0)
+        return ret;
+    }
   }
+  if(int ret = sceIoDclose(dfd) < 0)
+    return ret;
+      
+  if(int ret = sceIoRmdir(path.c_str()) < 0)
+    return ret;
 
   return 1;
 }

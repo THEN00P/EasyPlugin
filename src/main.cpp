@@ -120,6 +120,7 @@ int main() {
         vita2d_draw_texture(bgIMG, 0, 0);
 
         if(pad.buttons != SCE_CTRL_CROSS) sharedData.blockCross = false;
+        if(pad.buttons != SCE_CTRL_CIRCLE) sharedData.blockCircle = false;
         if(pad.buttons != SCE_CTRL_START) sharedData.blockStart = false;
         
         if(sharedData.scene == 0) listView.draw(sharedData, pad.buttons);

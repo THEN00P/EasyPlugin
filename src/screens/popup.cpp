@@ -20,25 +20,29 @@ void Popup::handleSkprx(SharedData &sharedData, int &currentPlugin, unsigned int
     string pluginEntry = "\n\n*Kernel\n"+sharedData.taiConfigPath+installFiles[currentPlugin];
     size_t pluginEntryPos = sharedData.taiConfig.find(pluginEntry);
 
-    if(pluginEntryPos != string::npos) {
-        int textWidth = vita2d_font_text_width(sharedData.font, 40, (installFiles[currentPlugin]+" is already installed").c_str());
+    int textWidth = vita2d_font_text_width(sharedData.font, 40, (pluginEntryPos != string::npos ? installFiles[currentPlugin]+" is already installed" : "Install "+installFiles[currentPlugin]+"?").c_str());
 
-        vita2d_font_draw_textf(sharedData.font, 480 - (textWidth/2), 272, RGBA8(255,255,255,255), 40, "%s is already installed.", installFiles[currentPlugin].c_str());
-        vita2d_draw_texture(desc2, 0, 504);
-    }
+    vita2d_font_draw_textf(sharedData.font, 480 - (textWidth/2), 272, pluginEntryPos != string::npos ? RGBA8(255,100,100,255) : RGBA8(255,255,255,255), 40, pluginEntryPos != string::npos ? "%s is already installed." : "Install %s?", installFiles[currentPlugin].c_str());
+    vita2d_draw_texture(pluginEntryPos != string::npos ? desc2 : desc3, 0, 504);
 
-    if(pluginEntryPos == string::npos) {        
+    if(pluginEntryPos == string::npos && button == SCE_CTRL_CROSS && !sharedData.blockCross) {
         Filesystem::copyFile(plPath+installFiles[currentPlugin], sharedData.taiConfigPath+installFiles[currentPlugin]);
         sharedData.taiConfig += pluginEntry;
+        sharedData.blockCross = true;
         currentPlugin++;
     }
     else if(button == SCE_CTRL_CROSS && !sharedData.blockCross) {
         sharedData.taiConfig.erase(pluginEntryPos, pluginEntry.length());
+        
+        if(sharedData.taiConfig.find(sharedData.taiConfigPath+installFiles[currentPlugin]) != string::npos)
+            sceIoRemove((sharedData.taiConfigPath+installFiles[currentPlugin]).c_str());
+
         sharedData.blockCross = true;
         currentPlugin++;
     }
 
-    if(button == SCE_CTRL_CIRCLE) {
+    if(button == SCE_CTRL_CIRCLE && !sharedData.blockCircle) {
+        sharedData.blockCircle = true;
         currentPlugin++;
     }
 }
@@ -107,8 +111,10 @@ void Popup::handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int
                 currentPlugin++;
                 break;
             case SCE_CTRL_CIRCLE:
+                if(sharedData.blockCircle) break;
                 selected = 0;
                 selectedApps.clear();
+                sharedData.blockCircle = true;
                 currentPlugin++;
                 break;
             case SCE_CTRL_CROSS:

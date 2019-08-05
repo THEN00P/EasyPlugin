@@ -29,6 +29,7 @@ struct SharedData {
     int scene = 0;
     int cursorY = 0;
     bool blockCross = false;
+    bool blockCircle = false;
     bool blockStart = false;
     bool initDetail = true;
     string taiConfig = "";
