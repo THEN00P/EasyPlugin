@@ -10,7 +10,7 @@ void Details::draw(SharedData &sharedData, unsigned int button) {
         cycleCounter = 0;
         imageCycles = 0;
         
-        longDescription = formatLongDesc(sharedData.plugins[sharedData.cursorY]["long_description"].get<string>());
+        longDescription = formatLongDesc(sharedData.plugins[sharedData.cursorY]["long_description"].get<string>(), sharedData.font, 920, 32);
 
         sharedData.initDetail = false;
     }
