@@ -6,15 +6,17 @@
 #include "../utils/filesystem.hpp"
 
 #include "../main.hpp"
+#include "screen.hpp"
 
-class Popup {
+class Popup : public Screen {
     public:
-        void draw(SharedData &sharedData, unsigned int button);
-        void free();
+        ~Popup();
+        void draw() override;
+        void handleInput(Input input) override;
 
     private:
-        void handleSuprx(SharedData &sharedData, int &currentPlugin, unsigned int button);
-        void handleSkprx(SharedData &sharedData, int &currentPlugin, unsigned int button);
+        void handleSuprx();
+        void handleSkprx();
         int selected = 0;
         int scrollY = 0;
         int scrollDelay = 0;
@@ -30,6 +32,8 @@ class Popup {
         double scrollPercent = 0;
         string plPath;
         string plName = "";
+        string pluginEntry;
+        size_t pluginEntryPos;
         vector<string> installFiles;
         vita2d_texture *desc = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc2.png");
         vita2d_texture *desc2 = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc3.png");

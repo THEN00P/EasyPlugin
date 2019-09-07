@@ -1,17 +1,22 @@
 #pragma once
 
 #include <vita2d.h>
+#include "screen.hpp"
 #include "../main.hpp"
 
-class Details {
+class Details : public Screen {
     public:
-        void draw(SharedData &sharedData, unsigned int button);
-        void free();
+        Details();
+        ~Details();
+        void draw() override;
+        void handleInput(Input input) override;
+        int zIndex = 1;
 
     private:
         string longDescription;
+        vector<vita2d_texture *> screenshots;
         int lastNum = 0;
         int imageCycles = 0;
         int cycleCounter = 0;
-        vita2d_texture *desc1 = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc1.png");
+        vita2d_texture *desc1;
 };

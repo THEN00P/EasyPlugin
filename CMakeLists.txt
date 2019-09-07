@@ -36,17 +36,14 @@ link_directories(
 file(GLOB vhbb
     "src/utils/vhbb/*.cpp"
     "src/utils/vhbb/*.c"
-    "src/utils/vhbb/*.h"
 )
 
 file(GLOB minizip
     "src/utils/vhbb/minizip/*.c"
-    "src/utils/vhbb/minizip/*.h"
 )
 
 file(GLOB screens
     "src/screens/*.cpp"
-    "src/screens/*.hpp"
 )
 
 add_executable(easyplugin
@@ -56,6 +53,7 @@ add_executable(easyplugin
     src/main.cpp
     src/net/download.cpp
     src/utils/filesystem.cpp
+    src/utils/input.cpp
     src/utils/search.cpp
     src/utils/format.cpp
     src/graphics/2dfont.cpp
