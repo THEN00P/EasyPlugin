@@ -81,7 +81,8 @@ void Details::handleInput(Input input) {
             screens.removeScreen(this);
         }
         if(input.newButtonsPressed(SCE_CTRL_CROSS)) {
-            Popup *popup;
+            Popup popupClass;
+            Screen *popup = &popupClass;
             screens.addScreen(popup);
         }
 }

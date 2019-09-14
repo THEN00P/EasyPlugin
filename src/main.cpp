@@ -30,7 +30,7 @@ Screens screens;
 json plugins;
 json originalPlugins;
 vector<AppInfo> appData;
-vita2d_font *font = vita2d_load_font_mem(basicfont, basicfont_size);
+vita2d_font *font;
 
 static void initSceAppUtil()
 {
@@ -100,6 +100,7 @@ int main() {
     vita2d_set_clear_color(RGBA8(255,255,255,255));
 
     vita2d_texture *bgIMG = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/bg.png");
+    font = vita2d_load_font_mem(basicfont, basicfont_size);
 
     Filesystem::mkDir("ux0:data/Easy_Plugins");
     curlDownload("http://rinnegatamante.it/vitadb/list_plugins_json.php", "ux0:data/Easy_Plugins/plugins.json");
@@ -118,8 +119,8 @@ int main() {
 
     Input input;
 
-    List *list;
-    sceClibPrintf("Main \n");
+    List listClass;
+    Screen *list = &listClass;
 
     screens.addScreen(list);
 

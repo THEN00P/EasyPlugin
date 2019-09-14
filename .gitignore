@@ -55,4 +55,5 @@ config.yml
 .vscode/
 
 # project specific
+test/**
 easyplugin

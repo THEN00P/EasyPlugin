@@ -11,6 +11,7 @@ class Details : public Screen {
         void draw() override;
         void handleInput(Input input) override;
         int zIndex = 1;
+        bool transparency = false;
 
     private:
         string longDescription;

@@ -4,6 +4,7 @@
 #include "screens.hpp"
 #include "details.hpp"
 #include "list.hpp"
+#include "sidebar.hpp"
 
 //defined in main.cpp
 extern json plugins;
@@ -12,6 +13,10 @@ extern Screens screens;
 extern vita2d_font *font;
 
 int listCursorY = 0;
+
+List::List() {
+    desc = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc.png");
+}
 
 void List::handleInput(Input input) {
     if(input.newButtonsPressed(SCE_CTRL_DOWN | SCE_CTRL_UP)) {
@@ -23,17 +28,23 @@ void List::handleInput(Input input) {
         if(scrollDelay == 0) scrollStage = 0;
 
         if(input.newButtonsPressed(SCE_CTRL_CROSS)) {
-            Details *details;
-
+            Details detailsClass;
+            Screen *details = &detailsClass;
+            
             screens.addScreen(details);
         }
         if(input.newButtonsPressed(SCE_CTRL_TRIANGLE)) {
-            initImeDialog("Search for a plugin", "", 28);
+            Sidebar sidebarClass;
+            Screen *sidebar = &sidebarClass;
+            
+            screens.addScreen(sidebar);
+            sceClibPrintf("%i", sidebar->zIndex);
+            // initImeDialog("Search for a plugin", "", 28);
 
-            listCursorY = 0;
+            // listCursorY = 0;
         }
-        if(input.newButtonsPressed(SCE_CTRL_UP)) {
-            if(listCursorY >= 0) {
+        if(input.buttonsPressed(SCE_CTRL_UP)) {
+            if(listCursorY > 0) {
                 if(scrollStage <= 10) {
                     if(scrollDelay == 1) scrollStage++;
                     scrollDelay = 8;
@@ -44,8 +55,8 @@ void List::handleInput(Input input) {
                 listCursorY--;
             }
         }
-        if(input.newButtonsPressed(SCE_CTRL_DOWN)) {
-            if(listCursorY <= arrayLength-1) {
+        if(input.buttonsPressed(SCE_CTRL_DOWN)) {
+            if(listCursorY < arrayLength-1) {
                 if(scrollStage <= 10) {
                     if(scrollDelay == 1) scrollStage++;
                     scrollDelay = 8;
@@ -60,8 +71,6 @@ void List::handleInput(Input input) {
 }
 
 void List::draw() {
-    sceClibPrintf("List \n");
-
     if(updateImeDialog() == IME_DIALOG_RESULT_FINISHED) {
         searchResult = string((char *)getImeDialogInputTextUTF8());
 
@@ -90,11 +99,10 @@ void List::draw() {
         if((i*85)+80-scrollY<0) continue;
 
         vita2d_font_draw_textf(font, 20, (i*85)+48-scrollY, RGBA8(255,255,255,255), 32, "%s", plugins[i]["name"].get<string>().c_str());
-        vita2d_font_draw_textf(font, 20, (i*85)+80-scrollY, RGBA8(255,255,255,255), 32, "%s", plugins[i]["description"].get<string>().c_str());
+        vita2d_font_draw_textf(font, 20, (i*85)+80-scrollY, RGBA8(255,255,255,255), 32, "%s", plugins[i]["description"].get<string>().c_str());;
     }
 
     vita2d_draw_rectangle(10, (listCursorY*85)+14-scrollY, 940, 80, RGBA8(0,0,0,80));
-    
     vita2d_draw_texture(desc, 0, 504);
 }
 

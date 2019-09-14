@@ -23,6 +23,13 @@ string toUppercase(string strToConvert) {
     return strToConvert;
 }
 
+Popup::Popup() {
+    desc = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc2.png");
+    desc2 = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc3.png");
+    desc3 = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc4.png");
+
+}
+
 void Popup::handleInput(Input input) {
     if(installFiles[currentPlugin].find(".skprx") != string::npos) {
         if(pluginEntryPos == string::npos && input.newButtonsPressed(SCE_CTRL_START)) {

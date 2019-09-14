@@ -21,8 +21,6 @@ void Screens::removeScreen(Screen *screen) {
 void Screens::update(Input input) {
     std::sort(components.begin(), components.end(), sortIndex);
 
-    sceClibPrintf("%i \n", components[0]->zIndex);
-
     for(Screen *component : components) {
         component->draw();
     }
