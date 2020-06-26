@@ -7,11 +7,12 @@
 
 #include "../main.hpp"
 #include "screen.hpp"
+#include "screens.hpp"
 
 class Popup : public Screen {
     public:
         Popup();
-        ~Popup();
+        void free() override;
         void draw() override;
         void handleInput(Input input) override;
 

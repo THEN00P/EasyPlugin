@@ -1,4 +1,6 @@
 #include <vita2d.h>
+#include <soloud.h>
+#include "soloud_wav.h"
 #include <psp2/kernel/processmgr.h>
 #include <psp2/power.h> 
 #include <psp2/io/fcntl.h>
@@ -23,6 +25,9 @@
 
 extern unsigned int basicfont_size;
 extern unsigned char basicfont[];
+
+SoLoud::Soloud gSoloud; // SoLoud engine
+SoLoud::Wav gWave;      // One wave file
 
 string taiConfig = "";
 string taiConfigPath = "";
@@ -91,11 +96,55 @@ static int getAppData(vector<AppInfo> &ret) {
     return 0;
 }
 
+
+int waveVerticalScroll1 = 0;
+int waveVerticalScroll2 = 0;
+int waveVerticalScroll3 = 0;
+
+void drawWaves() { 
+        //wave
+        for (int i = 0; i <= 960; i++)
+        {
+            vita2d_draw_line(i, 544, i, 
+                (
+                    sin(
+                        ((double) (i+waveVerticalScroll3) )/160
+                    )*25
+                )+280
+            , RGBA8(104,113,156,90));
+
+            vita2d_draw_line(i, 544, i, 
+                (
+                    sin(
+                        ((double) (i+waveVerticalScroll2) )/160
+                    )*25
+                )+290
+            , RGBA8(104,113,156,175));
+
+            vita2d_draw_line(i, 544, i, 
+                (
+                    sin(
+                        ((double) (i+waveVerticalScroll1) )/160
+                    )*25
+                )+300
+            , RGBA8(104,113,156,255));
+        }
+
+        waveVerticalScroll1 += 3;
+        waveVerticalScroll2 -= 4;
+        waveVerticalScroll3 -= 3;
+}
+
+bool toggle = false;
+
 int main() {
     vita2d_init();
     initSceAppUtil();
     httpInit();
     netInit();
+    gSoloud.init();
+    gWave.load("ux0:app/ESPL00009/resources/music.ogg");
+    gWave.setLooping(true);
 
     vita2d_set_clear_color(RGBA8(255,255,255,255));
 
@@ -129,7 +178,9 @@ int main() {
         vita2d_clear_screen();
 
         vita2d_draw_texture(bgIMG, 0, 0);
-        
+
+        drawWaves();
+
         input.updateLoop();
         screens.update(input);
 
@@ -138,11 +189,23 @@ int main() {
         vita2d_swap_buffers();
         sceDisplayWaitVblankStart();
 
+        if(!toggle) {
+            gSoloud.play(gWave);
+            toggle = true;
+        }
+
+        if(input.newButtonsPressed(SCE_CTRL_LTRIGGER)) {
+            screens.log();
+        }
+
         if(input.newButtonsPressed(SCE_CTRL_SELECT)) {
             break;
         }
     }
+    
+    screens.nuke();
 
+    gSoloud.deinit();
     httpTerm();
     netTerm();
     vita2d_free_font(font);

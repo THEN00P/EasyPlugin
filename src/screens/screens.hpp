@@ -8,6 +8,9 @@ class Screens {
         void addScreen(Screen *screen);
         void removeScreen(Screen *screen);
         void update(Input input);
+        void nuke();
+        void log();
     private:
         std::vector<Screen*> components;
+        std::vector<Screen*> removeQueue;
 };

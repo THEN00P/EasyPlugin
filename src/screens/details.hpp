@@ -2,18 +2,19 @@
 
 #include <vita2d.h>
 #include "screen.hpp"
+#include "popup.hpp"
 #include "../main.hpp"
 
 class Details : public Screen {
     public:
         Details();
-        ~Details();
+        void free() override;
         void draw() override;
         void handleInput(Input input) override;
-        int zIndex = 1;
-        bool transparency = false;
 
     private:
+        Popup popupClass;
+        Screen *popup = &popupClass;
         string longDescription;
         vector<vita2d_texture *> screenshots;
         int lastNum = 0;

@@ -120,15 +120,19 @@ int updateImeDialog() {
 	return status;
 }
 
+string toLowercase(string strToConvert) {
+    transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::tolower);
+    return strToConvert;
+}
+
 json sortJson(string filter, json original) {
+	filter = toLowercase(filter);
 	json ret;
 	int arrayLength = static_cast<int>(original.size());
 
-	for(int i=0;i<arrayLength;i++) {
-		if(original[i]["name"].get<string>().find(filter) != string::npos || original[i]["description"].get<string>().find(filter) != string::npos) {
+	for (int i = 0; i < arrayLength; i++)
+		if (toLowercase(original[i]["name"].get<string>()).find(filter) != string::npos || toLowercase(original[i]["description"].get<string>()).find(filter) != string::npos)
 			ret.push_back(original[i]);
-		}
-	}
 
 	return ret;
 }

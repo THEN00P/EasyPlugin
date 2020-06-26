@@ -3,17 +3,21 @@
 #include <vita2d.h>
 #include "../main.hpp"
 #include "screen.hpp"
+#include "sidebar.hpp"
+#include "details.hpp"
 
 class List : public Screen {
     public:
         List();
-        ~List();
+        void free() override;
         void draw() override;
         void handleInput(Input input) override;
-        int zIndex = 0;
-        bool transparency = false;
 
     private:
+        Details detailsClass;
+        Screen *details = &detailsClass;
+        Sidebar sidebarClass;
+        Screen *sidebar = &sidebarClass;
         double scrollY = 0;
         double scrollPercent;
         double scrollThumbHeight;

@@ -1,10 +1,8 @@
 #include "../main.hpp"
 #include "../utils/search.hpp"
 
-#include "screens.hpp"
-#include "details.hpp"
 #include "list.hpp"
-#include "sidebar.hpp"
+#include "screens.hpp"
 
 //defined in main.cpp
 extern json plugins;
@@ -28,17 +26,14 @@ void List::handleInput(Input input) {
         if(scrollDelay == 0) scrollStage = 0;
 
         if(input.newButtonsPressed(SCE_CTRL_CROSS)) {
-            Details detailsClass;
-            Screen *details = &detailsClass;
-            
+            detailsClass = Details();
+
             screens.addScreen(details);
         }
-        if(input.newButtonsPressed(SCE_CTRL_TRIANGLE)) {
-            Sidebar sidebarClass;
-            Screen *sidebar = &sidebarClass;
-            
+        if(input.newButtonsPressed(SCE_CTRL_TRIANGLE)) {      
+            sidebarClass = Sidebar();
+
             screens.addScreen(sidebar);
-            sceClibPrintf("%i", sidebar->zIndex);
             // initImeDialog("Search for a plugin", "", 28);
 
             // listCursorY = 0;
@@ -86,10 +81,11 @@ void List::draw() {
     
     if(scrollDelay >= 0) scrollDelay--;
 
-    vita2d_draw_rectangle(950, scrollThumbY, 10, scrollThumbHeight, RGBA8(0,0,0,150));
-
     if(listCursorY*85>scrollY+374) scrollY += 85;
     if(listCursorY*85<scrollY) scrollY -= 85;
+
+    vita2d_draw_rectangle(10, (listCursorY*85)+10-scrollY, 940, 80, RGBA8(0,0,0,80));    
+    vita2d_draw_rectangle(10, (listCursorY*85)+10-scrollY, 5, 80, RGBA8(30,30,30,255));
 
     // special iterator member functions for objects
     for(int i=0;i<arrayLength;i++) {
@@ -98,14 +94,15 @@ void List::draw() {
         if((i*85)-scrollY>544) break;
         if((i*85)+80-scrollY<0) continue;
 
-        vita2d_font_draw_textf(font, 20, (i*85)+48-scrollY, RGBA8(255,255,255,255), 32, "%s", plugins[i]["name"].get<string>().c_str());
-        vita2d_font_draw_textf(font, 20, (i*85)+80-scrollY, RGBA8(255,255,255,255), 32, "%s", plugins[i]["description"].get<string>().c_str());;
+        vita2d_draw_text_with_shadow(font, 20, (i*85)+45-scrollY, RGBA8(255,255,255,255), 32, "%s", (plugins[i]["name"].get<string>() + " " + plugins[i]["version"].get<string>()).c_str());
+        vita2d_draw_text_with_shadow(font, 20, (i*85)+76-scrollY, RGBA8(220,220,220,255), 32, "%s", plugins[i]["description"].get<string>().c_str());;
     }
 
-    vita2d_draw_rectangle(10, (listCursorY*85)+14-scrollY, 940, 80, RGBA8(0,0,0,80));
+    vita2d_draw_rectangle(950, scrollThumbY, 10, scrollThumbHeight, RGBA8(0,0,0,150));
     vita2d_draw_texture(desc, 0, 504);
 }
 
-List::~List() {
-    vita2d_free_texture(desc);
+void List::free() {
+    // gpu crash for some reason
+    // vita2d_free_texture(desc);
 }

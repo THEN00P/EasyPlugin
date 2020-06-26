@@ -18,7 +18,7 @@ include("${VITASDK}/share/vita.cmake" REQUIRED)
 
 set(VITA_APP_NAME "EasyPlugin")
 set(VITA_TITLEID  "ESPL00009")
-set(VITA_VERSION  "01.00")
+set(VITA_VERSION  "02.00")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,-q -Wall -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -62,6 +62,8 @@ add_executable(easyplugin
 target_link_libraries(easyplugin
     vita2d
     sqlite
+    soloud
+    pthread
     ${CURL_LIBRARIES}
     ${OPENSSL_LIBRARIES}
     freetype
@@ -87,6 +89,7 @@ target_link_libraries(easyplugin
     SceShellSvc_stub 
     SceDisplay_stub
     SceCommonDialog_stub
+    SceAudio_stub 
     SceLibKernel_stub
 )
 
@@ -99,6 +102,7 @@ vita_create_vpk(easyplugin.vpk ${VITA_TITLEID} easyplugin.self
   FILE sce_sys/livearea/contents/bg.png sce_sys/livearea/contents/bg.png
   FILE sce_sys/livearea/contents/startup.png sce_sys/livearea/contents/startup.png
   FILE sce_sys/livearea/contents/template.xml sce_sys/livearea/contents/template.xml
+  FILE src/graphics/music.ogg resources/music.ogg
   FILE src/graphics/bg.png resources/bg.png
   FILE src/graphics/desc.png resources/desc.png
   FILE src/graphics/desc1.png resources/desc1.png

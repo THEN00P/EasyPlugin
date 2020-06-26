@@ -62,6 +62,21 @@ static size_t write_data_to_disk(void *ptr, size_t size, size_t nmemb, void *str
     return written;
 }
 
+static size_t CurlWrite_CallbackFunc_StdString(void *contents, size_t size, size_t nmemb, std::string *s)
+{
+    size_t newLength = size*nmemb;
+    try
+    {
+        s->append((char*)contents, newLength);
+    }
+    catch(std::bad_alloc &e)
+    {
+        //handle memory problem
+        return 0;
+    }
+    return newLength;
+}
+
 void curlDownload(const char *url, const char *dest) {
 	int plFD = sceIoOpen( dest , SCE_O_WRONLY | SCE_O_CREAT, 0777);
 
@@ -90,7 +105,7 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
     CURL        *curl;
 
     SceUID file = sceIoOpen("ux0:data/Easy_Plugins/plugin.tmp", SCE_O_CREAT | SCE_O_WRONLY, 0777);
-    SceUID head = sceIoOpen("ux0:data/Easy_Plugins/head.tmp", SCE_O_CREAT | SCE_O_WRONLY, 0777);
+    std::string header;
 
     curl = curl_easy_init();
     if (curl) {
@@ -100,8 +115,8 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, write_data_to_disk);
-		curl_easy_setopt(curl, CURLOPT_HEADERDATA, &head);
+		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, CurlWrite_CallbackFunc_StdString);
+		curl_easy_setopt(curl, CURLOPT_HEADERDATA, &header);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data_to_disk);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &file);
 
@@ -109,9 +124,6 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
     }
 
     sceIoClose(file);
-    sceIoClose(head);
-
-    std::string header = Filesystem::readFile("ux0:data/Easy_Plugins/head.tmp");
 
 	if(header.find("filename=\"") != string::npos) {
 		header = header.substr(header.find("filename=\"")+10);
@@ -130,7 +142,6 @@ std::string curlDownloadKeepName(char const*const url, std::string dst) {
     Filesystem::copyFile("ux0:data/Easy_Plugins/plugin.tmp", dst+header);
 
     sceIoRemove("ux0:data/Easy_Plugins/plugin.tmp");
-    sceIoRemove("ux0:data/Easy_Plugins/head.tmp");
     
     curl_easy_cleanup(curl);
 	curl_global_cleanup();

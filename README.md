@@ -18,3 +18,9 @@ Compiling:
 cmake .
 make
 ```
+
+## Credits
+- [Electric1447](https://github.com/Electric1447) help and inspiration
+- [Rinnegatamante](https://github.com/Rinnegatamante) for creating VitaDB
+- [devnoname120](https://github.com/devnoname120) for a zip class I lifted from vhbb
+- The music is [apollon - soap](https://modarchive.org/index.php?request=view_by_moduleid&query=158029)

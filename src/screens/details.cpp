@@ -6,7 +6,6 @@
 #include "../net/download.hpp"
 #include "../utils/filesystem.hpp"
 #include "screens.hpp"
-#include "popup.hpp"
 
 #include "details.hpp"
 
@@ -32,9 +31,12 @@ vector<std::string> split(std::string strToSplit, char delimeter) {
 }
 
 Details::Details() {
+    //screen settings
+    zIndex = 1;
+
     desc1 = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc1.png");
     screenshots.clear();
-
+    
     if(plugins[listCursorY]["screenshots"].get<string>() != "") {
         vector<string> subPaths;
         if(!screenshots.empty()) {
@@ -81,8 +83,8 @@ void Details::handleInput(Input input) {
             screens.removeScreen(this);
         }
         if(input.newButtonsPressed(SCE_CTRL_CROSS)) {
-            Popup popupClass;
-            Screen *popup = &popupClass;
+            popupClass = Popup();
+
             screens.addScreen(popup);
         }
 }
@@ -105,14 +107,17 @@ void Details::draw() {
         }
     }
 
-    vita2d_font_draw_textf(font, 20, 45, RGBA8(255,255,255,255), 35, "%s", (plugins[listCursorY]["name"].get<string>() + " " + plugins[listCursorY]["version"].get<string>()).c_str());
+    vita2d_draw_text_with_shadow(font, 20, 45, RGBA8(255,255,255,255), 35, "%s", (plugins[listCursorY]["name"].get<string>() + " " + plugins[listCursorY]["version"].get<string>()).c_str());
+    vita2d_draw_text_with_shadow(font, 390 - vita2d_font_text_width(font, 20, plugins[listCursorY]["date"].get<string>().c_str()), 80, RGBA8(220,220,220,255), 20, "%s", plugins[listCursorY]["date"].get<string>().c_str());
+    vita2d_draw_text_with_shadow(font, 20, 80, RGBA8(220,220,220,255), 28, "by %s", plugins[listCursorY]["author"].get<string>().c_str());
+    vita2d_draw_text_with_shadow(font, 20, 310, RGBA8(220,220,220,255), 28, "Global downloads count: %s", plugins[listCursorY]["downloads"].get<string>().c_str());
     
-    vita2d_font_draw_textf(font, 20, 350, RGBA8(255,255,255,255), 32, "%s", longDescription.c_str());
+    vita2d_draw_text_with_shadow(font, 20, 350, RGBA8(255,255,255,255), 32, "%s", longDescription.c_str());
 
     vita2d_draw_texture(desc1, 0, 504);
 }
 
-Details::~Details() {
+void Details::free() {
     vita2d_free_texture(desc1);
     
     for(int i=0;i<screenshots.size();i++) {
