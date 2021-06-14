@@ -74,24 +74,26 @@ static int getAppData(vector<AppInfo> &ret) {
 	ret.emplace_back("ALL", "All", "");
 	ret.emplace_back("main", "Livearea (main)", "");
 
-    sqlite3 *db = NULL;
+#ifndef v3kDev
+        sqlite3 *db = NULL;
 
-    sceSysmoduleLoadModule(SCE_SYSMODULE_SQLITE);
+        sceSysmoduleLoadModule(SCE_SYSMODULE_SQLITE);
 
-    sqlite3_rw_init();
+        sqlite3_rw_init();
 
-    int rc = sqlite3_open_v2("ur0:shell/db/app.db", &db, SQLITE_OPEN_READONLY, NULL);
-    if(rc != SQLITE_OK) {
-        return -1;
-    }
+        int rc = sqlite3_open_v2("ur0:shell/db/app.db", &db, SQLITE_OPEN_READONLY, NULL);
+        if(rc != SQLITE_OK) {
+            return -1;
+        }
 
-    sqlite3_exec(db, "SELECT titleId, title, iconPath FROM tbl_appinfo_icon WHERE NOT titleId=\"NULL\" ORDER BY title ASC", callback, &ret, NULL);
+        sqlite3_exec(db, "SELECT titleId, title, iconPath FROM tbl_appinfo_icon WHERE NOT titleId=\"NULL\" ORDER BY title ASC", callback, &ret, NULL);
 
-	if (db != NULL)
-		sqlite3_close(db);
-	sqlite3_rw_exit();
+        if (db != NULL)
+            sqlite3_close(db);
+        sqlite3_rw_exit();
 
-    sceSysmoduleUnloadModule(SCE_SYSMODULE_SQLITE);
+        sceSysmoduleUnloadModule(SCE_SYSMODULE_SQLITE);
+#endif
 
     return 0;
 }
@@ -101,8 +103,7 @@ int waveVerticalScroll1 = 0;
 int waveVerticalScroll2 = 0;
 int waveVerticalScroll3 = 0;
 
-void drawWaves() { 
-        //wave
+void drawWaves() {
         for (int i = 0; i <= 960; i++)
         {
             vita2d_draw_line(i, 544, i, 
@@ -140,7 +141,11 @@ bool toggle = false;
 int main() {
     vita2d_init();
     initSceAppUtil();
-    httpInit();
+
+#ifndef v3kDev
+        httpInit();
+#endif
+
     netInit();
     gSoloud.init();
     gWave.load("ux0:app/ESPL00009/resources/music.ogg");
@@ -152,7 +157,10 @@ int main() {
     font = vita2d_load_font_mem(basicfont, basicfont_size);
 
     Filesystem::mkDir("ux0:data/Easy_Plugins");
+
+#ifndef v3kDev
     curlDownload("http://rinnegatamante.it/vitadb/list_plugins_json.php", "ux0:data/Easy_Plugins/plugins.json");
+#endif
 
     if(doesDirExist("ux0:tai")) taiConfigPath = "ux0:tai/";
     else if(doesDirExist("ur0:tai")) taiConfigPath = "ur0:tai/";
@@ -193,11 +201,7 @@ int main() {
             gSoloud.play(gWave);
             toggle = true;
         }
-
-        if(input.newButtonsPressed(SCE_CTRL_LTRIGGER)) {
-            screens.log();
-        }
-
+        
         if(input.newButtonsPressed(SCE_CTRL_SELECT)) {
             break;
         }
@@ -206,7 +210,9 @@ int main() {
     screens.nuke();
 
     gSoloud.deinit();
+#ifndef v3kDev
     httpTerm();
+#endif
     netTerm();
     vita2d_free_font(font);
     vita2d_free_texture(bgIMG);

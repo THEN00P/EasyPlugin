@@ -102,6 +102,9 @@ void curlDownload(const char *url, const char *dest) {
 }
 
 std::string curlDownloadKeepName(char const*const url, std::string dst) {
+	if(v3kDev)
+		return "ux0:data/Easy_Plugins/test.suprx";
+
     CURL        *curl;
 
     SceUID file = sceIoOpen("ux0:data/Easy_Plugins/plugin.tmp", SCE_O_CREAT | SCE_O_WRONLY, 0777);

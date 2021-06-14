@@ -9,6 +9,8 @@
 
 #include "utils/json.hpp"
 
+#define v3kDev true
+
 #define imageWebBase "http://rinnegatamante.it/vitadb/"
 
 using namespace std;

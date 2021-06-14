@@ -14,7 +14,6 @@ class Details : public Screen {
 
     private:
         Popup popupClass;
-        Screen *popup = &popupClass;
         string longDescription;
         vector<vita2d_texture *> screenshots;
         int lastNum = 0;

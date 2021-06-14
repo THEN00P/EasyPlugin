@@ -3,9 +3,11 @@
 #include <psp2/kernel/clib.h>
 #include <bits/stdc++.h>
 
-bool sortIndex(Screen *a, Screen *b) {
-    return a->zIndex < b->zIndex;
-}
+struct sortIndex {
+    bool const operator()(Screen *a, Screen *b) const {
+        return a->zIndex < b->zIndex;
+    }
+};
 
 void Screens::addScreen(Screen *screen) {
     components.push_back(screen);
@@ -23,13 +25,6 @@ void Screens::nuke() {
     
 }
 
-void Screens::log() {
-    for (size_t i = 0; i < components.size(); i++)
-    {
-        sceClibPrintf("%d\n", components[i]->zIndex);
-    }    
-}
-
 void Screens::update(Input input) {
     for (int i = 0; i < removeQueue.size(); i++) {
         for(int j=0; j<components.size(); j++) {
@@ -42,7 +37,7 @@ void Screens::update(Input input) {
     }
 
     int transparencyID = 0;
-    // std::sort(components.begin(),components.end(), sortIndex);
+    std::sort(components.begin(),components.end(), sortIndex());
 
     for(int i=components.size(); i --> 0; ) {
         if(!components[i]->transparency) {

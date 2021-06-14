@@ -15,9 +15,7 @@ class List : public Screen {
 
     private:
         Details detailsClass;
-        Screen *details = &detailsClass;
         Sidebar sidebarClass;
-        Screen *sidebar = &sidebarClass;
         double scrollY = 0;
         double scrollPercent;
         double scrollThumbHeight;

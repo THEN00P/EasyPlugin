@@ -57,3 +57,4 @@ config.yml
 # project specific
 test/**
 easyplugin
+*.sh

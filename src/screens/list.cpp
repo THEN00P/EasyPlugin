@@ -28,12 +28,12 @@ void List::handleInput(Input input) {
         if(input.newButtonsPressed(SCE_CTRL_CROSS)) {
             detailsClass = Details();
 
-            screens.addScreen(details);
+            screens.addScreen((Screen*) &detailsClass);
         }
         if(input.newButtonsPressed(SCE_CTRL_TRIANGLE)) {      
             sidebarClass = Sidebar();
 
-            screens.addScreen(sidebar);
+            screens.addScreen((Screen*) &sidebarClass);
             // initImeDialog("Search for a plugin", "", 28);
 
             // listCursorY = 0;
@@ -103,6 +103,5 @@ void List::draw() {
 }
 
 void List::free() {
-    // gpu crash for some reason
-    // vita2d_free_texture(desc);
+    vita2d_free_texture(desc);
 }

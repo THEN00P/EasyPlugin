@@ -37,6 +37,7 @@ Details::Details() {
     desc1 = vita2d_load_PNG_file("ux0:app/ESPL00009/resources/desc1.png");
     screenshots.clear();
     
+#ifndef v3kDev
     if(plugins[listCursorY]["screenshots"].get<string>() != "") {
         vector<string> subPaths;
         if(!screenshots.empty()) {
@@ -71,6 +72,7 @@ Details::Details() {
             }
         }
     }
+#endif
 
     cycleCounter = 0;
     imageCycles = 0;
@@ -85,7 +87,7 @@ void Details::handleInput(Input input) {
         if(input.newButtonsPressed(SCE_CTRL_CROSS)) {
             popupClass = Popup();
 
-            screens.addScreen(popup);
+            screens.addScreen((Screen*) &popupClass);
         }
 }
 
